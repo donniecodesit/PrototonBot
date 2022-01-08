@@ -194,6 +194,8 @@ namespace PrototonBot {
     //Runs when a user joins a server.
     private Task OnUserJoin(SocketGuildUser user) {
       var server = MongoHelper.GetServer(user.Guild.Id.ToString()).Result;
+      if (user.IsBot) return Task.CompletedTask;
+
       //If TOP.GG, ignore, otherwise send a welcome message if they're enabled.
       switch (user.Guild.Id.ToString()) {
         case "264445053596991498": {
