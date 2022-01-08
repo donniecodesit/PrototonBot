@@ -15,10 +15,8 @@ namespace PrototonBot.Commands
   {
     [Command("enablechannel")]
     [Alias("enable", "addchannel")]
-    public async Task EnableChannelAsync(string channelCalled = null)
-    {
-      if (channelCalled == null)
-      {
+    public async Task EnableChannelAsync(string channelCalled = null) {
+      if (channelCalled == null) {
         await Context.Channel.SendMessageAsync("Sorry, but you need to specify a channel for this command to work!");
         return;
       }
@@ -27,14 +25,12 @@ namespace PrototonBot.Commands
 
       var serverObj = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
       var actualChannel = Context.Guild.GetChannel(Convert.ToUInt64(filteredId));
-      if (actualChannel == null)
-      {
+      if (actualChannel == null) {
         await ReplyAsync($"{filteredId} does not exist in this server.");
         return;
       }
 
-      if (serverObj.EnabledChannels.Contains(filteredId))
-      {
+      if (serverObj.EnabledChannels.Contains(filteredId)) {
         await ReplyAsync($"<#{filteredId}> is already enabled!");
         return;
       }
@@ -48,10 +44,8 @@ namespace PrototonBot.Commands
 
     [Command("disablechannel")]
     [Alias("disable", "removechannel")]
-    public async Task DisableChannelAsync(string channelCalled = null)
-    {
-      if (channelCalled == null)
-      {
+    public async Task DisableChannelAsync(string channelCalled = null) {
+      if (channelCalled == null) {
         await Context.Channel.SendMessageAsync("Sorry, but you need to specify a channel for this command to work!");
         return;
       }
@@ -60,14 +54,12 @@ namespace PrototonBot.Commands
 
       var serverObj = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
       var actualChannel = Context.Guild.GetChannel(Convert.ToUInt64(filteredId));
-      if (actualChannel == null)
-      {
+      if (actualChannel == null) {
         await ReplyAsync($"{filteredId} does not exist in this server.");
         return;
       }
 
-      if (!serverObj.EnabledChannels.Contains(filteredId))
-      {
+      if (!serverObj.EnabledChannels.Contains(filteredId)) {
         await ReplyAsync($"<#{filteredId}> is already disabled!");
         return;
       }
@@ -81,62 +73,63 @@ namespace PrototonBot.Commands
 
     [Command("logchannel")]
     [Alias("log", "logging")]
-    public async Task SetLogChannel(string channelCalled = null)
-    {
-      if (channelCalled == null)
-      {
-        await Context.Channel.SendMessageAsync("Sorry, but you need to specify a channel for this command to work!");
+    public async Task SetLogChannel(string channelCalled = null) {
+      var serverObj = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
+      
+      if (channelCalled == null) {
+        await Context.Channel.SendMessageAsync("✕ Please tag a channel for this command.");
         return;
       }
+
+      if (channelCalled == "remove" || channelCalled == "clear") {
+        await MongoHelper.UpdateServer(Context.Guild.Id.ToString(), "LogChannel", "");
+        await ReplyAsync($"✓ Logging channel for this server cleared!");
+        return;
+      }
+
       var filteredId = UtilityHelper.FilterChannelIdInput(Context, channelCalled);
       if (filteredId == null) return;
-
-      var serverObj = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
-      var actualChannel = Context.Guild.GetChannel(Convert.ToUInt64(filteredId));
-      if (actualChannel == null)
-      {
-        await ReplyAsync($"{filteredId} does not exist in this server.");
+      if (Context.Guild.GetChannel(Convert.ToUInt64(filteredId)) == null) {
+        await ReplyAsync($"✕ {filteredId} does not exist in this server.");
         return;
       }
 
-      if (serverObj.LogChannel == filteredId)
-      {
+      if (serverObj.WelcomeChannel == filteredId) {
+        await ReplyAsync($"⚠ <#{filteredId}> is currently this server's welcome channel.");
+        return;
+      }
+
+      if (serverObj.LogChannel == filteredId) {
         await MongoHelper.UpdateServer(Context.Guild.Id.ToString(), "LogChannel", "");
-        await ReplyAsync($"<#{filteredId}> is no longer the Logging channel!");
+        await ReplyAsync($"✓ <#{filteredId}> is no longer the Logging channel!");
         return;
       }
 
       await MongoHelper.UpdateServer(Context.Guild.Id.ToString(), "LogChannel", filteredId);
-      await ReplyAsync($"Logging has been set to: <#{filteredId}>!");
+      await ReplyAsync($"✓ Logs have been set to: <#{filteredId}>");
     }
 
     [Command("serverprivacy")]
     [Alias("privacy")]
-    public async Task SetGuildPrivacy([Remainder] string setPrivacy)
-    {
+    public async Task SetGuildPrivacy([Remainder] string setPrivacy) {
       var serverObj = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
-      if (setPrivacy == "public")
-      {
+      if (setPrivacy == "public") {
         if (serverObj.Public) await ReplyAsync($"{Context.Guild.Name} is already public!");
-        else
-        {
+        else {
           await MongoHelper.UpdateServer(Context.Guild.Id.ToString(), "Public", true);
           await ReplyAsync($"{Context.Guild.Name} has been set to public!");
           return;
         }
       }
-      else if (setPrivacy == "private")
-      {
+      else if (setPrivacy == "private") {
         if (!serverObj.Public) await ReplyAsync($"{Context.Guild.Name} is already private!");
-        else
-        {
+        else {
           await MongoHelper.UpdateServer(Context.Guild.Id.ToString(), "Public", false);
           await ReplyAsync($"{Context.Guild.Name} has been set to private!");
           return;
         }
       }
-      else
-      {
+      else {
         await ReplyAsync("Please specify either `public` or `private`.");
         return;
       }
@@ -144,31 +137,25 @@ namespace PrototonBot.Commands
 
     [Command("levelups")]
     [Alias("levelmessages", "levelupmessages")]
-    public async Task SetGuildLevelUps([Remainder] string enableLevels)
-    {
+    public async Task SetGuildLevelUps([Remainder] string enableLevels) {
       var serverObj = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
-      if (enableLevels == "enable" || enableLevels == "on")
-      {
+      if (enableLevels == "enable" || enableLevels == "on") {
         if (serverObj.LevelUpMessages) await ReplyAsync($"Level Up Messages are already enabled for {Context.Guild.Name}!");
-        else
-        {
+        else {
           await MongoHelper.UpdateServer(Context.Guild.Id.ToString(), "LevelUpMessages", true);
           await ReplyAsync($"Level Up Messages are now enabled for {Context.Guild.Name}!");
           return;
         }
       }
-      else if (enableLevels == "disable" || enableLevels == "off")
-      {
+      else if (enableLevels == "disable" || enableLevels == "off") {
         if (!serverObj.LevelUpMessages) await ReplyAsync($"Level Up Messages are already disabled for {Context.Guild.Name}!");
-        else
-        {
+        else {
           await MongoHelper.UpdateServer(Context.Guild.Id.ToString(), "LevelUpMessages", false);
           await ReplyAsync($"Level Up Messages are now disabled for {Context.Guild.Name}!");
           return;
         }
       }
-      else
-      {
+      else {
         await ReplyAsync("Please specify either `enable`/`disable` or `on`/`off`.");
         return;
       }
@@ -176,11 +163,9 @@ namespace PrototonBot.Commands
 
     [Command("changeprefix")]
     [Alias("setprefix", "prefix")]
-    public async Task ChangeGuildPrefix([Remainder] string newPrefix)
-    {
+    public async Task ChangeGuildPrefix([Remainder] string newPrefix) {
       var tempPre = newPrefix;
-      if (!tempPre.Contains('!') && !tempPre.Contains('?') && !tempPre.Contains('+') || tempPre.Count() > 7 || tempPre.Contains(' '))
-      {
+      if (!tempPre.Contains('!') && !tempPre.Contains('?') && !tempPre.Contains('+') || tempPre.Count() > 7 || tempPre.Contains(' ')) {
         await ReplyAsync("Your new prefix must be 7 characters or less, contain `!`, `?`, or `+`, and may not contain spaces.");
         return;
       }
@@ -190,79 +175,77 @@ namespace PrototonBot.Commands
     }
 
     [Command("togglewelcomes")]
-    public async Task SetGuildWelcomes([Remainder] string enableWelcomes)
-    {
+    public async Task SetGuildWelcomes([Remainder] string enableWelcomes) {
       var serverObj = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
-      if (enableWelcomes == "enable" || enableWelcomes == "on")
-      {
+      if (enableWelcomes == "enable" || enableWelcomes == "on") {
         if (serverObj.WelcomeMessages) await ReplyAsync($"Welcome Messages are already enabled for {Context.Guild.Name}!");
-        else
-        {
+        else {
           await MongoHelper.UpdateServer(Context.Guild.Id.ToString(), "WelcomeMessages", true);
           await ReplyAsync($"Welcome Messages are now enabled for {Context.Guild.Name}!");
           return;
         }
       }
-      else if (enableWelcomes == "disable" || enableWelcomes == "off")
-      {
+      else if (enableWelcomes == "disable" || enableWelcomes == "off") {
         if (!serverObj.WelcomeMessages) await ReplyAsync($"Welcome Messages are already disabled for {Context.Guild.Name}!");
-        else
-        {
+        else {
           await MongoHelper.UpdateServer(Context.Guild.Id.ToString(), "WelcomeMessages", false);
           await ReplyAsync($"Welcome Messages are now disabled for {Context.Guild.Name}!");
           return;
         }
       }
-      else
-      {
+      else {
         await ReplyAsync("Please specify either `enable`/`disable` or `on`/`off`.");
         return;
       }
     }
 
     [Command("welcomechannel")]
-    public async Task SetWelcomeChannel(string channelCalled = null)
-    {
-      if (channelCalled == null)
-      {
-        await Context.Channel.SendMessageAsync("Sorry, but you need to specify a channel for this command to work!");
+    public async Task SetWelcomeChannel(string channelCalled = null) {
+      var serverObj = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
+
+      if (channelCalled == null) {
+        await Context.Channel.SendMessageAsync("✕ Please tag a channel for this command.");
         return;
       }
+
+      if (channelCalled == "remove" || channelCalled == "clear") {
+        await MongoHelper.UpdateServer(Context.Guild.Id.ToString(), "WelcomeChannel", "");
+        await ReplyAsync($"✓ Welcome channel for this server cleared!");
+        return;
+      }
+
       var filteredId = UtilityHelper.FilterChannelIdInput(Context, channelCalled);
       if (filteredId == null) return;
-
-      var serverObj = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
-      var actualChannel = Context.Guild.GetChannel(Convert.ToUInt64(filteredId));
-      if (actualChannel == null)
-      {
-        await ReplyAsync($"{filteredId} does not exist in this server.");
+      if (Context.Guild.GetChannel(Convert.ToUInt64(filteredId)) == null) {
+        await ReplyAsync($"✕ {filteredId} does not exist in this server.");
         return;
       }
 
-      if (serverObj.LogChannel == filteredId)
-      {
+      if (serverObj.LogChannel == filteredId) {
+        await ReplyAsync($"⚠ <#{filteredId}> is currently this server's log channel.");
+        return;
+      }
+
+      if (serverObj.WelcomeChannel == filteredId) {
         await MongoHelper.UpdateServer(Context.Guild.Id.ToString(), "WelcomeChannel", "");
-        await ReplyAsync($"<#{filteredId}> is no longer the Welcome Channel!");
+        await ReplyAsync($"✓ <#{filteredId}> is no longer the Welcome channel!");
         return;
       }
 
       await MongoHelper.UpdateServer(Context.Guild.Id.ToString(), "WelcomeChannel", filteredId);
-      await ReplyAsync($"The Welcome Channel has been set to: <#{filteredId}>!");
+      await ReplyAsync($"✓ Welcomes have been set to: <#{filteredId}>");
     }
 
     [Command("massrolecheck")]
     public async Task MassRoleCheck([Remainder] string style = null)
     {
-      if (style == null)
-      {
+      if (style == null) {
         await Context.Channel.SendMessageAsync("Please specify which list you want by typing `name` or `id` after the command.");
         return;
       }
       var userList = "";
-      if (style.ToLower() == "name")
-      {
-        if (Context.Guild.Id.ToString() == Program.MasterSvr)
-        {
+      if (style.ToLower() == "name") {
+        if (Context.Guild.Id.ToString() == Program.MasterSvr) {
           var staffRole = Context.Guild.Roles.FirstOrDefault(role => role.Name == "Trusted Staff");
           var query =
               from c in Context.Guild.Users
@@ -279,8 +262,7 @@ namespace PrototonBot.Commands
           embed.WithFooter("This command does not tag/ping the users, as it's inside of an embed.");
           await Context.Channel.SendMessageAsync("", false, embed.Build());
         }
-        else
-        {
+        else {
           var query =
               from c in Context.Guild.Users
               orderby c.Roles.Count descending
@@ -296,10 +278,8 @@ namespace PrototonBot.Commands
           await Context.Channel.SendMessageAsync("", false, embed.Build());
         }
       }
-      else if (style.ToLower() == "id")
-      {
-        if (Context.Guild.Id.ToString() == Program.MasterSvr)
-        {
+      else if (style.ToLower() == "id") {
+        if (Context.Guild.Id.ToString() == Program.MasterSvr) {
           var staffRole = Context.Guild.Roles.FirstOrDefault(role => role.Name == "Trusted Staff");
           var query =
               from c in Context.Guild.Users
@@ -316,15 +296,13 @@ namespace PrototonBot.Commands
           embed.WithFooter("This command does not tag/ping the users, as it's inside of an embed.");
           await Context.Channel.SendMessageAsync("", false, embed.Build());
         }
-        else
-        {
+        else {
           var query =
               from c in Context.Guild.Users
               orderby c.Roles.Count descending
               select c;
           var objects = query.Take(15);
-          foreach (var obj in objects)
-          {
+          foreach (var obj in objects) {
             userList += $"<@{obj.Id}> with {obj.Roles.Count - 1} roles.\n";
           }
           var embed = new EmbedBuilder();
@@ -333,8 +311,7 @@ namespace PrototonBot.Commands
           await Context.Channel.SendMessageAsync("", false, embed.Build());
         }
       }
-      else
-      {
+      else {
         await Context.Channel.SendMessageAsync("Please specify which list you want by typing `name` or `id` after the command.");
         return;
       }
@@ -342,16 +319,14 @@ namespace PrototonBot.Commands
 
     [Command("purge")]
     [Alias("prune")]
-    public async Task Purge([Remainder] int amount = 0)
-    {
+    public async Task Purge([Remainder] int amount = 0) {
       if (amount <= 0) { await Context.Channel.SendMessageAsync("Please specify how many messages to delete (1 - 100)"); return; }
       if (amount > 100) { await Context.Channel.SendMessageAsync("Sorry, I can only purge up to 100 messages!"); return; }
       var messages = await Context.Channel.GetMessagesAsync(Context.Message, Direction.Before, amount).FlattenAsync();
       var messagesFiltered = messages.Where(x => (DateTimeOffset.UtcNow - x.Timestamp).TotalDays <= 14);
       var count = messagesFiltered.Count();
       if (count == 0) { await Context.Channel.SendMessageAsync("Nothing was deleted, I may only delete messages up to 14 days old."); }
-      else
-      {
+      else {
         await Context.Channel.DeleteMessageAsync(Context.Message.Id);
         await (Context.Channel as ITextChannel).DeleteMessagesAsync(messagesFiltered);
         const int delay = 2500;
