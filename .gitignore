@@ -1,5 +1,6 @@
 .idea/
 .vs/
+.vscode/
 ecosystem.config.js
 [Bb]in/
 [Oo]ut/
