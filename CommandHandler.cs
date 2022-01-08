@@ -120,7 +120,9 @@ namespace PrototonBot {
         //Check if the command exists, if it doesn't, return early.
         var command = msgSliced.Split(' ')[0];
         var found = cmdList.Find(cmd => (cmd.Name.ToLower().Equals(command) || cmd.Aliases.Contains(command)));
-        if (found == null) return;
+        if (found == null) {
+          return;
+        }
 
         //If the channel is not enabled for commands, or the user is not an admin, inform them.
         var hasPermissions = (message.Author as SocketGuildUser).GetPermissions(message.Channel as SocketGuildChannel).ManageChannel;
@@ -141,7 +143,6 @@ namespace PrototonBot {
         if (!result.IsSuccess) {
           switch (result.Error) {
             case CommandError.UnknownCommand: {
-                //await context.Message.AddReactionAsync(new Emoji("❔"));
                 return;
             }
             case CommandError.BadArgCount: {
@@ -212,16 +213,16 @@ namespace PrototonBot {
     }
 
     //Runs when a user leaves a server.
-    private Task OnUserLeave(SocketGuildUser user) {
-      var server = MongoHelper.GetServer(user.Guild.Id.ToString()).Result;
+    private Task OnUserLeave(SocketGuild guild, SocketUser user) {
+      var server = MongoHelper.GetServer(guild.Id.ToString()).Result;
       //If TOP.GG, ignore, otherwise send a leaving message if they're enabled.
-      switch (user.Guild.Id.ToString()) {
+      switch (guild.Id.ToString()) {
         case "264445053596991498": {
             break;
           }
         default: {
             if (!server.WelcomeMessages || server.WelcomeChannel == "") { return Task.CompletedTask; }
-            var welcomeChannel = user.Guild.GetTextChannel(Convert.ToUInt64(server.WelcomeChannel));
+            var welcomeChannel = guild.GetTextChannel(Convert.ToUInt64(server.WelcomeChannel));
             welcomeChannel.SendMessageAsync($"{user.Username} has departed from this server.. We wish them a friendly farewell! :broken_heart:");
             break;
           }
