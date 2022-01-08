@@ -4,10 +4,8 @@ using PrototonBot.MongoUtil;
 using Discord;
 using Discord.WebSocket;
 
-namespace PrototonBot
-{
-  public class UserUpdates
-  {
+namespace PrototonBot {
+  public class UserUpdates {
     private static Random random = new Random();
     //Handles giving the user Money and XP for talking, with a 1 minute cooldown.
     public static Task MinuteRewards(IUser author) {

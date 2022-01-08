@@ -2,10 +2,8 @@ using System;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace PrototonBot
-{
-  class UtilityHelper
-  {
+namespace PrototonBot {
+  class UtilityHelper {
     //The user is a marked as a developer if any of these IDs match.
     public static bool IsUserDeveloper(string userId) {
       return userId == "285937628363227138" || userId == "103610948526284800";
