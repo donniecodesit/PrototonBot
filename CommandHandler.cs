@@ -9,21 +9,17 @@ using PrototonBot.MongoUtil;
 using System.Linq;
 using DiscordBotsList.Api.Objects;
 using DiscordBotsList.Api;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver.Core.WireProtocol.Messages;
 
-namespace PrototonBot
-{
-  public class CommandHandler
-  {
+namespace PrototonBot {
+  public class CommandHandler {
     private readonly CommandService commands;
     private readonly DiscordSocketClient client;
     private readonly IServiceProvider services;
     private static AuthDiscordBotListApi dblListApi = null;
     Random random = new Random();
 
-    public CommandHandler(IServiceProvider services)
-    {
+    //Initialize the state of the CommandHandler
+    public CommandHandler(IServiceProvider services) {
       this.services = services;
       this.client = services.GetRequiredService<DiscordSocketClient>();
       this.commands = services.GetRequiredService<CommandService>();
@@ -38,40 +34,37 @@ namespace PrototonBot
       this.client.ChannelDestroyed += OnChannelDeleted;
     }
 
-    public async Task InitializeAsync()
-    {
+    //Runs when the bot starts
+    public async Task InitializeAsync() {
       await this.commands.AddModulesAsync(Assembly.GetEntryAssembly(), this.services);
     }
 
-    private async Task OnReady()
-    {
+    //Runs when the bot has finished starting up
+    private async Task OnReady() {
       await client.SetStatusAsync(UserStatus.Online);
       await client.SetGameAsync("pr.help", null, ActivityType.Listening);
 
-      if (Program.EnableBotList)
-      {
+      //If you're using TOP.GG, this will update the bot page's server count.
+      if (Program.EnableBotList) {
         dblListApi = new AuthDiscordBotListApi(client.CurrentUser.Id, Program.BotListToken);
-        var serversConnected = 0;
-        foreach (var svr in client.Guilds) { serversConnected++; }
-        IDblSelfBot dblStats = await dblListApi.GetMeAsync();
-        await dblStats.UpdateStatsAsync(serversConnected);
+        await UpdateDBL();
       }
     }
 
-    private Task OnDisconnect(Exception err)
-    {
+    //Runs when the bot's been disconnected.
+    private Task OnDisconnect(Exception err) {
       return Task.CompletedTask;
     }
 
-    public Task OnCommandAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
-    {
+    //Runs any time a command is received.
+    public Task OnCommandAsync(Optional<CommandInfo> command, ICommandContext context, IResult result) {
       if (!command.IsSpecified) return Task.CompletedTask;
       if (result.IsSuccess) return Task.CompletedTask;
       return Task.CompletedTask;
     }
 
-    private async Task OnError(ICommandContext context, IUserMessage message, IResult result)
-    {
+    //Runs whenever an unhandled error occurs.
+    private async Task OnError(ICommandContext context, IUserMessage message, IResult result) {
       await context.Channel.SendMessageAsync($"Sorry, that command didn't work. Double check that you used it properly.");
       var embed = new EmbedBuilder()
         .WithTitle("Unhandled Exception")
@@ -84,154 +77,129 @@ namespace PrototonBot
         .AddField("Result", $"`{result.Error}: {result.ErrorReason}`");
     }
 
-    public async Task OnMessageReceivedAsync(SocketMessage rawMessage)
-    {
+    //Runs on every single message seen.
+    public async Task OnMessageReceivedAsync(SocketMessage rawMessage) {
+      //If the message source is from a bot, null/empty, or the user's discrim is #0000, return.
       if (!(rawMessage is SocketUserMessage message)
           || message.Source != MessageSource.User
           || message == null
           || message.Author.Discriminator == "0000") return;
+      //If the bot was DMed, run OnDirectMessage.
       if (message.Channel.GetType() == typeof(SocketDMChannel)) { await OnDirectMessage(message); return; }
 
+      //Set up context, perform per-message functions, create user and server objects.
+      var context = new SocketCommandContext(this.client, message);
       await MongoHelper.CreateUser(message.Author);
       await UserUpdates.MinuteRewards(message.Author);
       await UserUpdates.LevelUpdater(message);
 
       var user = MongoHelper.GetUser(message.Author.Id.ToString()).Result;
-      var inv = MongoHelper.GetInventory(message.Author.Id.ToString()).Result;
       var server = MongoHelper.GetServer((message.Channel as SocketGuildChannel).Guild.Id.ToString()).Result;
-      var context = new SocketCommandContext(this.client, message);
-
-
-      if (user.Name != message.Author.Username)
-      {
+      
+      if (user.Name != message.Author.Username) {
         await MongoHelper.UpdateUser(user.Id, "Name", message.Author.Username.ToString());
       }
-      if (server.Name != (message.Channel as SocketGuildChannel).Guild.Name)
-      {
+      if (server.Name != (message.Channel as SocketGuildChannel).Guild.Name) {
         await MongoHelper.UpdateServer(server.Id, "Name", (message.Channel as SocketGuildChannel).Guild.Name);
       }
 
-      try
-      {
-        var argPosition = 0;
-        var noPrefix = "";
+      try {
+        //Check the prefix of the message and assign it to a variable with the prefix split off.
+        var atIndex = 0;
+        var msgSliced = "";
         var cmdList = commands.Commands.ToList();
 
-        if (message.HasStringPrefix(server.Prefix, ref argPosition))
-        {
-          noPrefix = message.ToString().Replace(server.Prefix, "");
+        if (message.HasStringPrefix(server.Prefix, ref atIndex)) {
+          msgSliced = message.ToString().Replace(server.Prefix, "");
         }
-        else if (message.HasStringPrefix("pr.", ref argPosition))
-        {
-          noPrefix = message.ToString().Replace("pr.", "");
+        else if (message.HasStringPrefix("pr.", ref atIndex)) {
+          msgSliced = message.ToString().Replace("pr.", "");
         }
         else return;
 
-        if (!server.EnabledChannels.Contains(message.Channel.Id.ToString()) && !(message.Author as SocketGuildUser).GetPermissions(message.Channel as SocketGuildChannel).ManageChannel)
-        {
-          if (message.Content.StartsWith(server.Prefix) || message.Content.StartsWith("pr"))
-          {
-            var found = cmdList.Find(cmd => cmd.Name.ToLower().Equals(noPrefix.Split(' ')[0]));
-            if (found != null)
-            {
-              //PrototonBot can be muted/removed from the DBL server if it responds to other bot's prefixes, so it has to be muted.
-              if (server.Id.ToString() != "264445053596991498")
-              {
-                await context.Channel.SendMessageAsync("Commands not enabled in this channel, an admin needs to use the `enable` command.");
-              }
-            }
-            return;
+        //Check if the command exists, if it doesn't, return early.
+        var command = msgSliced.Split(' ')[0];
+        var found = cmdList.Find(cmd => (cmd.Name.ToLower().Equals(command) || cmd.Aliases.Contains(command)));
+        if (found == null) return;
+
+        //If the channel is not enabled for commands, or the user is not an admin, inform them.
+        var hasPermissions = (message.Author as SocketGuildUser).GetPermissions(message.Channel as SocketGuildChannel).ManageChannel;
+        if (!server.EnabledChannels.Contains(message.Channel.Id.ToString()) && !hasPermissions) {
+          //PrototonBot can be muted/removed from the TOP.GG server if it responds to other bot's prefixes, so it has to be muted.
+          if (server.Id.ToString() != "264445053596991498") {
+            await context.Channel.SendMessageAsync("Commands not enabled in this channel, an admin needs to use the `enable` command.");
           }
+          return;
         }
 
+        //The command is valid and the bot is processing now, so enter the typing state.
         IResult result;
-        using (context.Channel.EnterTypingState())
-        {
-          result = await this.commands.ExecuteAsync(context, argPosition, this.services);
+        using (context.Channel.EnterTypingState()) {
+          result = await this.commands.ExecuteAsync(context, atIndex, this.services);
         }
 
-        if (!result.IsSuccess)
-        {
-          switch (result.Error)
-          {
-            case CommandError.UnknownCommand:
-              {
-                //var NoCommand = new Emoji("❔");
-                //await context.Message.AddReactionAsync(NoCommand);
+        if (!result.IsSuccess) {
+          switch (result.Error) {
+            case CommandError.UnknownCommand: {
+                //await context.Message.AddReactionAsync(new Emoji("❔"));
                 return;
-              }
-            case CommandError.BadArgCount:
-              {
-                await context.Channel.SendMessageAsync(
-                    $"Sorry, but that command wasn't used correctly. Try {server.Prefix}help to learn more.");
+            }
+            case CommandError.BadArgCount: {
+                await context.Channel.SendMessageAsync("Sorry, but that command wasn't used correctly. Try {server.Prefix}help to learn more.");
                 return;
-              }
-            case CommandError.ParseFailed:
-              {
-                await context.Channel.SendMessageAsync(
-                    $"Sorry, but I wasn't able to understand that. Please try again with normal text.");
+            }
+            case CommandError.ParseFailed: {
+                await context.Channel.SendMessageAsync("Sorry, but I wasn't able to understand that. Please try again with normal text.");
                 return;
-              }
-            case CommandError.UnmetPrecondition:
-              {
-                await context.Channel.SendMessageAsync("This command only works for users with the **Administrator** permission."); return;
-              }
-            default:
-              {
+            }
+            case CommandError.UnmetPrecondition: {
+                await context.Channel.SendMessageAsync("This command only works for users with the **Administrator** permission."); 
+                return;
+            }
+            default: {
                 await OnError(context, message, result);
                 return;
-              }
+            }
           }
         }
-        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} PrototonBot    {DateTime.Now.ToString("MM-dd")} : {(message.Channel as SocketGuildChannel).Guild.Name} : {message.Content}");
+        Console.WriteLine($"{DateTime.Now.ToString("MM-dd HH:mm:ss")} [PrototonBot]: '{(message.Channel as SocketGuildChannel).Guild.Name}' >> '{message.Content}'");
       }
       catch (Discord.Net.HttpException) { }
     }
 
-    public async Task OnDirectMessage(SocketMessage rawMessage)
-    {
+    //Runs when a user DMs the bot.
+    public async Task OnDirectMessage(SocketMessage rawMessage) {
       await rawMessage.Channel.SendMessageAsync("PrototonBot is not used via DMs. Please use PrototonBot commands in a server.");
+      Console.WriteLine(client.Guilds.Count());
     }
 
-    private async Task OnNewServer(IGuild server)
-    {
-      if (Program.EnableBotList)
-      {
-        var serversConnected = 0;
-        foreach (var serverUpdate in client.Guilds) { serversConnected++; }
-        IDblSelfBot dblStats = await dblListApi.GetMeAsync();
-        await dblStats.UpdateStatsAsync(serversConnected);
-      }
+    //Runs when the bot joins a server.
+    private async Task OnNewServer(IGuild server) {
+      //If you're using TOP.GG, this will update the bot page's server count.
+      await UpdateDBL();
+      //Create the server info in the database.
       await MongoHelper.CreateServer(server);
       SocketGuild newServer = server as SocketGuild;
       var svrDB = MongoHelper.GetServer(newServer.Id.ToString()).Result;
       await newServer.SystemChannel.SendMessageAsync($">>> Thank you for inviting me to this server! :purple_heart:\nAn administrator can learn what they can set up for the server, and need to enable channels before users can use commands. Please check out ``{svrDB.Prefix}help`` or ``pr.help`` to learn more about commands and configuring this bot! :)\nAdmins can use commands anywhere as long as they have the ManageChannel permission.");
     }
 
-    private async Task OnLeaveServer(IGuild server)
-    {
-      if (Program.EnableBotList)
-      {
-        var serversConnected = 0;
-        foreach (var serverUpdate in client.Guilds) { serversConnected++; }
-        IDblSelfBot dblStats = await dblListApi.GetMeAsync();
-        await dblStats.UpdateStatsAsync(serversConnected);
-      }
+    //Runs when the bot leaves a server.
+    private async Task OnLeaveServer(IGuild server) {
+      //If you're using TOP.GG, this will update the bot page's server count.
+      await UpdateDBL();
       await MongoHelper.DeleteServer(server);
     }
 
-    private Task OnUserJoin(SocketGuildUser user)
-    {
+    //Runs when a user joins a server.
+    private Task OnUserJoin(SocketGuildUser user) {
       var server = MongoHelper.GetServer(user.Guild.Id.ToString()).Result;
-
-      switch (user.Guild.Id.ToString())
-      {
-        case "264445053596991498": //TOP.GG
-          {
+      //If TOP.GG, ignore, otherwise send a welcome message if they're enabled.
+      switch (user.Guild.Id.ToString()) {
+        case "264445053596991498": {
             break;
           }
-        default: //Any Other Server
-          {
+        default: {
             if (!server.WelcomeMessages || server.WelcomeChannel == "") { break; }
             var welcomeChannel = user.Guild.GetTextChannel(Convert.ToUInt64(server.WelcomeChannel));
             welcomeChannel.SendMessageAsync($":sparkling_heart: Welcome <@{user.Id}>, to **{server.Name}**! Have a wonderful time here! :sparkling_heart:");
@@ -241,18 +209,15 @@ namespace PrototonBot
       return Task.CompletedTask;
     }
 
-    private Task OnUserLeave(SocketGuildUser user)
-    {
+    //Runs when a user leaves a server.
+    private Task OnUserLeave(SocketGuildUser user) {
       var server = MongoHelper.GetServer(user.Guild.Id.ToString()).Result;
-
-      switch (user.Guild.Id.ToString())
-      {
-        case "264445053596991498": //TOP.GG
-          {
+      //If TOP.GG, ignore, otherwise send a leaving message if they're enabled.
+      switch (user.Guild.Id.ToString()) {
+        case "264445053596991498": {
             break;
           }
-        default: //Any Other Server
-          {
+        default: {
             if (!server.WelcomeMessages || server.WelcomeChannel == "") { return Task.CompletedTask; }
             var welcomeChannel = user.Guild.GetTextChannel(Convert.ToUInt64(server.WelcomeChannel));
             welcomeChannel.SendMessageAsync($"{user.Username} has departed from this server.. We wish them a friendly farewell! :broken_heart:");
@@ -262,24 +227,30 @@ namespace PrototonBot
       return Task.CompletedTask;
     }
 
-    private Task OnChannelDeleted(SocketChannel channel)
-    {
+    //Runs when a channel is deleted.
+    private Task OnChannelDeleted(SocketChannel channel) {
+      //If the channel deleted matched any config it may have been set to, clear or remove it from there.
       var server = MongoHelper.GetServer((channel as SocketGuildChannel).Guild.Id.ToString()).Result;
-      if (server.WelcomeChannel == channel.Id.ToString())
-      {
+      if (server.WelcomeChannel == channel.Id.ToString()) {
         MongoHelper.UpdateServer(server.Id.ToString(), "WelcomeChannel", "");
       }
-      if (server.LogChannel == channel.Id.ToString())
-      {
+      if (server.LogChannel == channel.Id.ToString()) {
         MongoHelper.UpdateServer(server.Id.ToString(), "LogChannel", "");
       }
-      if (server.EnabledChannels.Contains(channel.Id.ToString()))
-      {
+      if (server.EnabledChannels.Contains(channel.Id.ToString())) {
         var currentlyEnabled = server.EnabledChannels;
         currentlyEnabled.Remove(channel.Id.ToString());
         MongoHelper.UpdateServer(server.Id.ToString(), "EnabledChannels", currentlyEnabled);
       }
       return Task.CompletedTask;
+    }
+
+    //Helper function to update server count on DBL/TOP.GG
+    private async Task UpdateDBL() {
+      if (Program.EnableBotList) {
+        IDblSelfBot dblStats = await dblListApi.GetMeAsync();
+        await dblStats.UpdateStatsAsync(client.Guilds.Count());
+      }
     }
   }
 }
