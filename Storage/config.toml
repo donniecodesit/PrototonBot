@@ -1,0 +1,9 @@
+DiscordToken = "DiscordTokenHere"
+
+EnableBotList = false
+BotListToken = "BotListTokenHere"
+MongoURL = "mongodb://localhost"
+
+MasterSvr = "HomeServerIDHere"
+UserID = "BotUserIDHere"
+CacheDir = "/tmp/prototon"

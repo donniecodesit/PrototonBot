@@ -1,0 +1,14 @@
+.idea/
+.vs/
+ecosystem.config.js
+[Bb]in/
+[Oo]ut/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+[Pp]roperties/
+x86/
+x64/
+*.cmd
+*.sh
+*.dll
