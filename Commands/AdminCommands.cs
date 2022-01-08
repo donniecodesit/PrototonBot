@@ -164,13 +164,13 @@ namespace PrototonBot.Commands
     [Command("changeprefix")]
     [Alias("setprefix", "prefix")]
     public async Task ChangeGuildPrefix([Remainder] string newPrefix) {
-      var tempPre = newPrefix;
-      if (!tempPre.Contains('!') && !tempPre.Contains('?') && !tempPre.Contains('+') || tempPre.Count() > 7 || tempPre.Contains(' ')) {
-        await ReplyAsync("Your new prefix must be 7 characters or less, contain `!`, `?`, or `+`, and may not contain spaces.");
+      var pref = newPrefix;
+      if (!pref.Contains('!') && !pref.Contains('?') && !pref.Contains('+') && !pref.Contains('.') || pref.Contains(' ') || pref.Count() > 7 || pref.Count() < 2) {
+        await ReplyAsync("Your new prefix must be 2 to 7 characters or less, contain `!`, `?`, `.`, or `+`, and may not contain spaces.");
         return;
       }
-      await MongoHelper.UpdateServer(Context.Guild.Id.ToString(), "Prefix", tempPre);
-      await ReplyAsync($"All set! The new prefix for {Context.Guild.Name} is now ``{tempPre}``!");
+      await MongoHelper.UpdateServer(Context.Guild.Id.ToString(), "Prefix", pref);
+      await ReplyAsync($"All set! The new prefix for {Context.Guild.Name} is now ``{pref}``!");
       return;
     }
 
