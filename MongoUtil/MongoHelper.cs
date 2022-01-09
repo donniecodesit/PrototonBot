@@ -111,6 +111,7 @@ namespace PrototonBot.MongoUtil
       userData.Name = user.Username.ToString();
       userData.Money = 500;
       userData.LastDaily = 0;
+      userData.DailyStreak = 0;
       userData.Level = 0;
       userData.EXP = 0;
       userData.LastMessage = 0;

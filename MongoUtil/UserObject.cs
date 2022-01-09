@@ -19,6 +19,10 @@ namespace PrototonBot.MongoUtil
     /// </summary>
     public long LastDaily { get; set; }
     /// <summary>
+    /// Tracks the days the user has been claiming their daily daily.
+    /// </summary>
+    public long DailyStreak { get; set; }
+    /// <summary>
     /// Level of the User.
     /// </summary>
     public int Level { get; set; }
