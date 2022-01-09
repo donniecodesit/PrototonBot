@@ -137,6 +137,8 @@ namespace PrototonBot {
         //The command is valid and the bot is processing now, so enter the typing state.
         IResult result;
         using (context.Channel.EnterTypingState()) {
+          var msg = (message.Content.Length > 37) ? (message.Content.Substring(0, 37) + "...") : message.Content;
+          Console.WriteLine($"{DateTime.Now.ToString("MM-dd HH:mm:ss")} [PrototonBot]: '{(message.Channel as SocketGuildChannel).Guild.Name}' >> '{msg}'");
           result = await this.commands.ExecuteAsync(context, atIndex, this.services);
         }
 
@@ -163,7 +165,6 @@ namespace PrototonBot {
             }
           }
         }
-        Console.WriteLine($"{DateTime.Now.ToString("MM-dd HH:mm:ss")} [PrototonBot]: '{(message.Channel as SocketGuildChannel).Guild.Name}' >> '{message.Content}'");
       }
       catch (Discord.Net.HttpException) { }
     }

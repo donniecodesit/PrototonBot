@@ -76,10 +76,11 @@ namespace PrototonBot.Commands
     {
       var serverObj = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
       var embed = new EmbedBuilder();
+      var privacy = serverObj.Public ? "Public" : "Private";
       embed.WithColor(0xFF00FF);
       embed.WithThumbnailUrl(Context.Guild.IconUrl);
       embed.WithTitle($"{Context.Guild.Name} Information");
-      embed.AddField("Server Information", $"Server ID: *{Context.Guild.Id}*\nCreated At: *{Context.Guild.CreatedAt}*\nOwner: *{Context.Guild.Owner}*\nMembers: *{Context.Guild.MemberCount}*\nChannels: *{Context.Guild.Channels.Count}*\nRoles: *{Context.Guild.Roles.Count}*\nRegion: *{Context.Guild.VoiceRegionId}*\nVerification Level: *{Context.Guild.VerificationLevel}*\nLevel Messages Enabled: *{serverObj.LevelUpMessages}*\nServer is Public: *{serverObj.Public}*\nPrefix: *{serverObj.Prefix}*");
+      embed.AddField("Server Information", $"Server ID: `{Context.Guild.Id}`\nCreated At: `{Context.Guild.CreatedAt}`\nOwner: `{Context.Guild.Owner}`\nMembers: `{Context.Guild.MemberCount}`\nChannels: `{Context.Guild.Channels.Count}`\nRoles: `{Context.Guild.Roles.Count}`\nVerification Level: `{Context.Guild.VerificationLevel}`\nLevel Messages Enabled: `{serverObj.LevelUpMessages}`\nServer Privacy: `{privacy}`\nPrefix: `{serverObj.Prefix}`");
       await Context.Channel.SendMessageAsync("", false, embed.Build());
     }
   }

@@ -7,3 +7,8 @@ MongoURL = "mongodb://localhost"
 MasterSvr = "HomeServerIDHere"
 UserID = "BotUserIDHere"
 CacheDir = "/tmp/prototon"
+
+DeveloperIDs = [
+    "285937628363227138",
+    "459402945792966658"
+]

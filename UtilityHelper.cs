@@ -1,12 +1,17 @@
 using System;
 using Discord.Commands;
 using Discord.WebSocket;
+using Nett;
+using System.IO;
+using System.Collections.Generic;
 
 namespace PrototonBot {
   class UtilityHelper {
     //The user is a marked as a developer if any of these IDs match.
     public static bool IsUserDeveloper(string userId) {
-      return userId == "285937628363227138" || userId == "103610948526284800";
+      TomlTable config = Toml.ReadFile(Path.Combine("Storage", "config.toml"));
+      var developers = config.Get<List<string>>("DeveloperIDs");
+      return developers.Contains(userId);
     }
 
     //Take the input of a ping (formatted ID), or a raw ID to validate their presence in the server.

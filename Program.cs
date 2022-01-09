@@ -60,6 +60,7 @@ namespace PrototonBot {
         client.Log += Log;
         Console.CancelKeyPress += delegate {
           client.LogoutAsync();
+          client.StopAsync();
           Environment.Exit(0);
         };
         await client.LoginAsync(TokenType.Bot, DiscordToken);
