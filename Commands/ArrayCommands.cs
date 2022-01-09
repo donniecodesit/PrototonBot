@@ -15,6 +15,10 @@ namespace PrototonBot.Commands
     [Command("8ball")]
     public async Task EightBall([Remainder] string input = null) {
       var text = vars.Get<List<string>>("fortunes");
+      if (input != null && !input.Contains("?")) {
+        await Context.Channel.SendMessageAsync($"<@{Context.User.Id}> that didn't seem like a question.. you know**?**");
+        return;
+      }
       await Context.Channel.SendMessageAsync($"{text[rand.Next(text.Count)]} <@{Context.User.Id}>");
     }
 

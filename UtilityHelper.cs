@@ -1,4 +1,5 @@
 using System;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Nett;
@@ -16,12 +17,10 @@ namespace PrototonBot {
 
     //Take the input of a ping (formatted ID), or a raw ID to validate their presence in the server.
     public static string FilterUserIdInput(SocketCommandContext context, string input) {
-      var result = input;
-      SocketGuildUser user;
-      result = (input != null ? input.Trim('<', '!', '@', '>', ' ') : context.Message.Author.Id.ToString());
-
+      var result = (input != null ? input.Trim('<', '!', '@', '>', ' ') : context.Message.Author.Id.ToString());;
+      IUser user;
       try {
-        user = context.Guild.GetUser(Convert.ToUInt64(result));
+        user = context.Client.GetUserAsync(Convert.ToUInt64(result)).Result;
         return (!user.IsBot ? result : throw new ArgumentException());
       }
       catch (NullReferenceException) {

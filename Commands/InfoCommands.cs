@@ -65,6 +65,7 @@ namespace PrototonBot.Commands
       await Context.Channel.SendMessageAsync("", false, embed.Build());
     }
 
+    //Reply with information about the server
     [Command("serverinfo")]
     public async Task ServerInfo() {
       var serverObj = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
@@ -77,6 +78,7 @@ namespace PrototonBot.Commands
       await Context.Channel.SendMessageAsync("", false, embed.Build());
     }
 
+    //Reply with the user's input
     [Command("simonsays")]
     public async Task SimonSays([Remainder] string input) {
       if (input != null) await Context.Channel.SendMessageAsync($"{input}");
