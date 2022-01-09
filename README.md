@@ -25,3 +25,7 @@ Before setting this bot up, please check the requirements below and ensure they'
 - Update `(net5.0 or your folder)`/`Storage/config.toml` with the API keys and IDs required inside the file. DiscordBotList is optional.
 - Finally, start your MongoDB server and run the bot by either opening `PrototonBot.exe` inside your build folder, 
 - >or running with `./PrototonBot.exe` (or just `./PrototonBot` on *nix systems).
+
+### License
+This project is licensed under the Creative Commons BY-NC-SA 4.0 License.
+You can read about the license [here](https://creativecommons.org/licenses/by-nc-sa/4.0), or the full license text in [license.txt](https://github.com/donovanlaws/PrototonBot/blob/main/license.txt).
