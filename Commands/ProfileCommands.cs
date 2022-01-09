@@ -9,30 +9,23 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace PrototonBot.Commands
-{
-
-  public class ProfileCommands : ModuleBase<SocketCommandContext>
-  {
+namespace PrototonBot.Commands {
+  public class ProfileCommands : ModuleBase<SocketCommandContext> {
     [Command("profile-embed")]
-    public async Task ProfileEmbed(string userCalled = null)
-    {
+    public async Task ProfileEmbed(string userCalled = null) {
       UserObject user;
       InventoryObject inv;
-      if (userCalled == null)
-      {
+      if (userCalled == null) {
         user = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
         inv = MongoHelper.GetInventory(Context.User.Id.ToString()).Result;
-      }
-      else
-      {
+      } else {
         var filteredId = UtilityHelper.FilterUserIdInput(Context, userCalled);
         if (filteredId == null) return;
         user = MongoHelper.GetUser(filteredId).Result;
         inv = MongoHelper.GetInventory(filteredId).Result;
       }
-      if (user == null || inv == null)
-      {
+
+      if (user == null || inv == null) {
         await Context.Channel.SendMessageAsync($"<@{Context.User.Id}> sorry about this, but that user has no data yet. They need to have talked in a server I'm present in first.");
         return;
       }
@@ -40,35 +33,27 @@ namespace PrototonBot.Commands
       double multiplier = 1;
       if (user.Boosted || user.Mutuals) multiplier = 1.05;
       if (user.Boosted && user.Mutuals) multiplier = 1.1;
-
       var embed = new EmbedBuilder();
-      if (UtilityHelper.IsUserDeveloper(user.Id))
-      {
+      if (UtilityHelper.IsUserDeveloper(user.Id)) {
         embed.WithTitle($":star2: {user.Name}'s PrototonBot Profile :star2:");
         embed.WithColor(0xB285FE);
         embed.WithDescription($"This user is a developer for PrototonBot!\n{user.Description}");
-      }
-      else
-      {
+      } else {
         embed.WithTitle(user.Name);
         embed.WithColor(0xB2A2F1);
         embed.WithDescription($"{user.Description}");
       }
-
-      embed.WithThumbnailUrl(Context.Guild.GetUser(Convert.ToUInt64(user.Id.ToString())).GetAvatarUrl());
+      embed.WithThumbnailUrl(Context.Client.GetUserAsync(Convert.ToUInt64(user.Id.ToString())).Result.GetAvatarUrl());
       embed.WithFooter("Boosted & Mutual Partners both provide a 5% boost to Chat EXP and Protobucks.");
       embed.AddField(":moneybag: Protobucks", user.Money, true);
       embed.AddField(":game_die: Level & EXP", $"**{user.Level}** ({user.EXP})", true);
       embed.AddField(":speak_no_evil: Pats Received", user.PatsReceived, true);
       embed.AddField(":money_with_wings: Items Bought", user.Purchases, true);
 
-      if (user.Partner != "None")
-      {
+      if (user.Partner != "None") {
         var partner = MongoHelper.GetUser(user.Partner).Result;
         embed.AddField(":knife: Crime Partner", partner.Name, true);
-      }
-      else
-      {
+      } else {
         embed.AddField(":knife: Crime Partner", "None", true);
       }
 
@@ -78,13 +63,11 @@ namespace PrototonBot.Commands
       embed.AddField(":arrow_double_up: Stats", $"Luck: {user.Luck}\nDaily Bonus: {user.DailyBonus}", true);
       embed.AddField("Transfers", $"Received: {user.TransferIn}\nSent: {user.TransferOut}", true);
       embed.AddField(":chart_with_upwards_trend: PrototonBot Boosted", $"{user.Boosted} ({multiplier}x)", true);
-
       await Context.Channel.SendMessageAsync("", false, embed.Build());
     }
 
     // Image read settings (and images) are never modified, unlike text settings.
-    private static readonly MagickReadSettings ImageReadSettings = new MagickReadSettings
-    {
+    private static readonly MagickReadSettings ImageReadSettings = new MagickReadSettings {
       BackgroundColor = MagickColors.Transparent
     };
 
@@ -97,36 +80,30 @@ namespace PrototonBot.Commands
     private static MagickImage ExperienceBar = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "experience_bar.png"), ImageReadSettings);
     private static MagickImage ExperienceBarOutline = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "experience_bar_outline.png"), ImageReadSettings);
 
-    [Command("profile")]
-    [Alias("currency", "bank", "account", "me", "money")]
-    public async Task ProfileNew(string userCalled = null)
-    {
+    [Command("profile")] [Alias("currency", "bank", "account", "me", "money")]
+    public async Task ProfileNew(string userCalled = null) {
       UserObject user;
       InventoryObject inv;
       Directory.CreateDirectory(Program.CacheDir);
       var webClient = new WebClient();
 
-      if (userCalled == null)
-      {
+      if (userCalled == null) {
         user = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
         inv = MongoHelper.GetInventory(Context.User.Id.ToString()).Result;
-      }
-      else
-      {
+      } else {
         var filteredId = UtilityHelper.FilterUserIdInput(Context, userCalled);
         if (filteredId == null) return;
         user = MongoHelper.GetUser(filteredId).Result;
         inv = MongoHelper.GetInventory(filteredId).Result;
       }
-      if (user == null || inv == null)
-      {
+
+      if (user == null || inv == null) {
         await Context.Channel.SendMessageAsync($"<@{Context.User.Id}> sorry about this, but that user has no data yet. They need to have talked in a server I'm present in first.");
         return;
       }
 
       // Text read settings are modified, so they must be re-initialized every time.
-      var textSettings = new MagickReadSettings
-      {
+      var textSettings = new MagickReadSettings {
         BackgroundColor = MagickColors.Transparent,
         FillColor = MagickColors.White,
         FontFamily = "Yeon Sung",
@@ -138,7 +115,7 @@ namespace PrototonBot.Commands
       };
 
       // Profile photo is the only user-specific variable we use. Delete the old one, and get fresh ones.
-      var discordUser = Context.Guild.GetUser(Convert.ToUInt64(user.Id));
+      var discordUser = Context.Client.GetUserAsync(Convert.ToUInt64(user.Id)).Result;
       webClient.DownloadFile($"https://cdn.discordapp.com/avatars/{discordUser.Id}/{discordUser.AvatarId}.png?size=512", Path.Combine(Program.CacheDir, $"{user.Id}.png"));
       var userPhoto = new MagickImage(Path.Combine(Program.CacheDir, $"{user.Id}.png"), ImageReadSettings);
 
@@ -244,42 +221,32 @@ namespace PrototonBot.Commands
       await Context.Channel.SendFileAsync(Path.Combine(Program.CacheDir, $"{user.Id}_out.png"));
     }
 
-    [Command("bag")]
-    [Alias("inventory", "bags", "items")]
-    public async Task BagEmbed(string userCalled = null)
-    {
+    [Command("bag")] [Alias("inventory", "bags", "items")]
+    public async Task BagEmbed(string userCalled = null) {
       UserObject user;
       InventoryObject inv;
-      if (userCalled == null)
-      {
+      if (userCalled == null) {
         user = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
         inv = MongoHelper.GetInventory(Context.User.Id.ToString()).Result;
-      }
-      else
-      {
+      } else {
         var filteredId = UtilityHelper.FilterUserIdInput(Context, userCalled);
         if (filteredId == null) return;
         user = MongoHelper.GetUser(filteredId).Result;
         inv = MongoHelper.GetInventory(filteredId).Result;
       }
-      if (user == null || inv == null)
-      {
+      if (user == null || inv == null) {
         await Context.Channel.SendMessageAsync($"<@{Context.User.Id}> sorry about this, but that user has no data yet. They need to have talked in a server I'm present in first.");
         return;
       }
       var embed = new EmbedBuilder();
-      if (UtilityHelper.IsUserDeveloper(user.Id))
-      {
+      if (UtilityHelper.IsUserDeveloper(user.Id)) {
         embed.WithTitle($":star2: {user.Name}'s PrototonBot Bag :star2:");
         embed.WithColor(0xB285FE);
-      }
-      else
-      {
+      } else {
         embed.WithTitle($"{user.Name}'s PrototonBot Bag");
         embed.WithColor(0xB2A2F1);
       }
-      
-      embed.WithThumbnailUrl(Context.Guild.GetUser(Convert.ToUInt64(user.Id.ToString())).GetAvatarUrl());
+      embed.WithThumbnailUrl(Context.Client.GetUserAsync(Convert.ToUInt64(user.Id.ToString())).Result.GetAvatarUrl());
       embed.WithFooter("Numbers in parenthesis are how many uses that item has left.");
       embed.AddField(":pick:", $"{inv.Picks} ({inv.PickUses})", true);
       embed.AddField(":gem:", $"{inv.Diamonds}", true);
@@ -297,14 +264,12 @@ namespace PrototonBot.Commands
     }
 
     [Command("daily")]
-    public async Task DailyRedemption()
-    {
+    public async Task DailyRedemption() {
       UserObject user = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
       InventoryObject inv = MongoHelper.GetInventory(Context.User.Id.ToString()).Result;
       var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-      if (user.LastDaily > (currentTime - 86400))
-      {
+      if (user.LastDaily > (currentTime - 86400)) {
         long secsRemaining = ((user.LastDaily + 86400) - currentTime);
         var spanOfTime = TimeSpan.FromSeconds(secsRemaining);
         string str = spanOfTime.Hours + " hour(s), " + spanOfTime.Minutes + " minute(s), and " + spanOfTime.Seconds + " second(s)!";
@@ -333,19 +298,15 @@ namespace PrototonBot.Commands
       await Context.Channel.SendMessageAsync("", false, dailySuccess.Build());
     }
 
-    [Command("pat")]
-    [Alias("pet")]
-    public async Task PatRedemption(string userCalled = null)
-    {
-      if (userCalled == null)
-      {
+    [Command("pat")] [Alias("pet")]
+    public async Task PatRedemption(string userCalled = null) {
+      if (userCalled == null) {
         await Context.Channel.SendMessageAsync("Sorry, but you need to tag someone for this command to work!");
         return;
       }
       var filteredId = UtilityHelper.FilterUserIdInput(Context, userCalled);
       if (filteredId == null) return;
-      if (filteredId == Context.Message.Author.Id.ToString())
-      {
+      if (filteredId == Context.Message.Author.Id.ToString()) {
         await Context.Channel.SendMessageAsync($"Don't you think it'd be unfair to give yourself a pat? You have arms after all, just pat yourself on the back! <@{Context.User.Id}>");
         return;
       }
@@ -353,14 +314,13 @@ namespace PrototonBot.Commands
       var taggedUsr = MongoHelper.GetUser(filteredId).Result;
       var authorUsr = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
       var authorInv = MongoHelper.GetInventory(Context.User.Id.ToString()).Result;
-      if (authorUsr == null || taggedUsr == null || authorInv == null)
-      {
+      if (authorUsr == null || taggedUsr == null || authorInv == null) {
         await Context.Channel.SendMessageAsync($"<@{Context.User.Id}> sorry about this, but that user has no data yet. They need to have talked in a server I'm present in first.");
         return;
       }
+      
       var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-      if (authorUsr.LastPat > (currentTime - 86400))
-      {
+      if (authorUsr.LastPat > (currentTime - 86400)) {
         long secsRemaining = ((authorUsr.LastPat + 86400) - currentTime);
         var spanOfTime = TimeSpan.FromSeconds(secsRemaining);
         string str = spanOfTime.Hours + " hours, " + spanOfTime.Minutes + " minutes, and " + spanOfTime.Seconds + " seconds!";
@@ -386,35 +346,27 @@ namespace PrototonBot.Commands
     }
 
     [Command("wallet")]
-    public async Task WalletEmbed(string userCalled = null)
-    {
+    public async Task WalletEmbed(string userCalled = null) {
       UserObject user;
       InventoryObject inv;
-      if (userCalled == null)
-      {
+      if (userCalled == null) {
         user = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
         inv = MongoHelper.GetInventory(Context.User.Id.ToString()).Result;
-      }
-      else
-      {
+      } else {
         var filteredId = UtilityHelper.FilterUserIdInput(Context, userCalled);
         if (filteredId == null) return;
         user = MongoHelper.GetUser(filteredId).Result;
         inv = MongoHelper.GetInventory(filteredId).Result;
       }
-      if (user == null || inv == null)
-      {
+      if (user == null || inv == null) {
         await Context.Channel.SendMessageAsync($"<@{Context.User.Id}> sorry about this, but that user has no data yet. They need to have talked in a server I'm present in first.");
         return;
       }
       var embed = new EmbedBuilder();
-      if (UtilityHelper.IsUserDeveloper(user.Id))
-      {
+      if (UtilityHelper.IsUserDeveloper(user.Id)) {
         embed.WithTitle($":star2: {user.Name}'s Wallet :star2:");
         embed.WithColor(0xB285FE);
-      }
-      else
-      {
+      } else {
         embed.WithTitle($"{user.Name}'s Wallet");
         embed.WithColor(0xB2A2F1);
       }
@@ -428,12 +380,9 @@ namespace PrototonBot.Commands
       await Context.Channel.SendMessageAsync("", false, embed.Build());
     }
 
-    [Command("transfer")]
-    [Alias("send")]
-    public async Task TransferProtobucks(string userCalled = null, string moneyToSend = null)
-    {
-      if (userCalled == null || moneyToSend == null)
-      {
+    [Command("transfer")] [Alias("send")]
+    public async Task TransferProtobucks(string userCalled = null, string moneyToSend = null) {
+      if (userCalled == null || moneyToSend == null) {
         await Context.Channel.SendMessageAsync("Make sure to tag the recipient and then specify the amount to send!");
         return;
       }
@@ -444,37 +393,31 @@ namespace PrototonBot.Commands
       if (filteredId == null) return;
       user = MongoHelper.GetUser(filteredId).Result;
       author = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
-      if (user == null)
-      {
+      if (user == null) {
         await Context.Channel.SendMessageAsync($"<@{Context.User.Id}> sorry about this, but that user has no data yet. They need to have talked in a server I'm present in first.");
         return;
       }
 
       long moneySending = 0;
 
-      try
-      {
+      try {
         moneySending = Convert.ToInt64(moneyToSend);
       }
-      catch (FormatException)
-      {
+      catch (FormatException) {
         await Context.Channel.SendMessageAsync("Please make sure the money you're sending is a valid number!");
         return;
       }
-      if (moneySending <= 0)
-      {
+      if (moneySending <= 0) {
         await Context.Channel.SendMessageAsync("Please make sure the money you're sending is a valid number!");
         return;
       }
 
-      if (user.Id == Context.Message.Author.Id.ToString())
-      {
+      if (user.Id == Context.Message.Author.Id.ToString()) {
         await Context.Channel.SendMessageAsync("You can't send money to yourself, silly!");
         return;
       }
 
-      if (moneySending > author.Money)
-      {
+      if (moneySending > author.Money) {
         await Context.Channel.SendMessageAsync("Baka! You don't even have that much money to send!");
         return;
       }
@@ -485,20 +428,16 @@ namespace PrototonBot.Commands
       //recipient receives the money and gains transfer in
       await MongoHelper.UpdateUser(user.Id, "Money", (user.Money + moneySending));
       await MongoHelper.UpdateUser(user.Id, "TransferIn", (user.TransferIn + moneySending));
-
       await Context.Channel.SendMessageAsync($">>> Beep boop, boop bop! *Success!*\n{Context.User.Username}'s Protobucks: {author.Money} --> {author.Money - moneySending}\n{user.Name}'s Protobucks: {user.Money} --> {user.Money + moneySending}");
       return;
     }
 
-    [Command("partnerup")]
-    [Alias("setpartner", "partner", "marry")]
-    public async Task SetPartner(string userCalled = null)
-    {
+    [Command("partnerup")] [Alias("setpartner", "partner", "marry")]
+    public async Task SetPartner(string userCalled = null) {
       UserObject author;
       UserObject partner;
       UserObject currentPartner;
-      if (userCalled == null)
-      {
+      if (userCalled == null) {
         await Context.Channel.SendMessageAsync("Sorry, but you need to tag someone for this command to work!");
         return;
       }
@@ -508,170 +447,126 @@ namespace PrototonBot.Commands
 
       author = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
       partner = MongoHelper.GetUser(filteredId).Result;
-
-      if (partner == null)
-      {
+      if (partner == null) {
         await Context.Channel.SendMessageAsync($"<@{author.Id}> sorry about this, but that user has no data yet. They need to have talked in a server I'm present in first.");
         return;
       }
 
-      if (author.Partner == filteredId)
-      {
+      if (author.Partner == filteredId) {
         await Context.Channel.SendMessageAsync($"<@{author.Id}>, hey hey! {partner.Name} is already your partner!");
         return;
       }
 
-      if (filteredId == Context.Message.Author.Id.ToString())
-      {
+      if (filteredId == Context.Message.Author.Id.ToString()) {
         await Context.Channel.SendMessageAsync("How can you be your ***own partner*** in crime?");
         return;
       }
 
-      if (author.Partner == "None")
-      {
+      if (author.Partner == "None") {
         await MongoHelper.UpdateUser(author.Id, "Partner", filteredId);
-        if (partner.Partner == Context.User.Id.ToString())
-        {
+        if (partner.Partner == Context.User.Id.ToString()) {
           await MongoHelper.UpdateUser(author.Id, "Mutuals", true);
           await MongoHelper.UpdateUser(partner.Id, "Mutuals", true);
           await Context.Channel.SendMessageAsync($"Awe, nice! You and {partner.Name} are now mutual partners!");
-        }
-        else
-        {
+        } else {
           await Context.Channel.SendMessageAsync($"Awe, nice! {partner.Name} is now your partner!");
         }
       }
 
-      if (author.Partner != "None")
-      {
+      if (author.Partner != "None") {
         currentPartner = MongoHelper.GetUser(author.Partner).Result;
         await MongoHelper.UpdateUser(author.Id, "Partner", filteredId);
 
 
-        if (partner.Partner == Context.User.Id.ToString())
-        {
+        if (partner.Partner == Context.User.Id.ToString()) {
           await MongoHelper.UpdateUser(author.Id, "Mutuals", true);
           await MongoHelper.UpdateUser(partner.Id, "Mutuals", true);
           await Context.Channel.SendMessageAsync($"Awe, nice! You and {partner.Name} are now mutual partners!");
         }
 
-        if (currentPartner.Partner == Context.User.Id.ToString())
-        {
+        if (currentPartner.Partner == Context.User.Id.ToString()) {
           await MongoHelper.UpdateUser(currentPartner.Id, "Partner", "None");
           await MongoHelper.UpdateUser(currentPartner.Id, "Mutuals", false);
           await MongoHelper.UpdateUser(author.Id, "Mutuals", false);
-          if (partner.Partner == author.Id)
-          {
+          if (partner.Partner == author.Id) {
             await Context.Channel.SendMessageAsync($"Awe, you and {currentPartner.Name} are no longer partners, but {partner.Name} is now your mutual partner!");
             await MongoHelper.UpdateUser(author.Id, "Mutuals", true);
             await MongoHelper.UpdateUser(partner.Id, "Mutuals", true);
-
-          }
-          else
-          {
+          } else {
             await Context.Channel.SendMessageAsync($"Awe, you and {currentPartner.Name} are no longer partners, but {partner.Name} is now your partner!");
           }
         }
 
-        if (partner.Partner != Context.User.Id.ToString() && currentPartner.Partner != Context.User.Id.ToString())
-        {
+        if (partner.Partner != Context.User.Id.ToString() && currentPartner.Partner != Context.User.Id.ToString()) {
           await Context.Channel.SendMessageAsync($"Sad to see em go... {currentPartner.Name} is no longer your partner, but {partner.Name} is now your partner!");
-          if (partner.Partner == author.Id)
-          {
+          if (partner.Partner == author.Id) {
             await Context.Channel.SendMessageAsync($"Awe, you and {currentPartner.Name} are no longer partners, but {partner.Name} is now your mutual partner!");
             await MongoHelper.UpdateUser(author.Id, "Mutuals", true);
             await MongoHelper.UpdateUser(partner.Id, "Mutuals", true);
-          }
-          else
-          {
+          } else {
             await Context.Channel.SendMessageAsync($"Awe, you and {currentPartner.Name} are no longer partners, but {partner.Name} is now your partner!");
           }
         }
-        return;
       }
       return;
     }
 
-    [Command("removepartner")]
-    [Alias("partnerdown", "divorce", "unpartner")]
-    public async Task RemovePartner()
-    {
+    [Command("removepartner")] [Alias("partnerdown", "divorce", "unpartner")]
+    public async Task RemovePartner() {
       UserObject author = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
-      if (author.Partner == "None")
-      {
+      if (author.Partner == "None") {
         await Context.Channel.SendMessageAsync("You don't have a partner to remove!");
         return;
       }
       UserObject partner = MongoHelper.GetUser(author.Partner).Result;
       await MongoHelper.UpdateUser(author.Id, "Partner", "None");
       await MongoHelper.UpdateUser(author.Id, "Mutuals", false);
-      if (partner.Partner == author.Id)
-      {
+      if (partner.Partner == author.Id) {
         await MongoHelper.UpdateUser(partner.Id, "Partner", "None");
         await MongoHelper.UpdateUser(partner.Id, "Mutuals", false);
         await Context.Channel.SendMessageAsync($"Awe, you and {partner.Name} are no longer partners.");
-      }
-      else
-      {
+      } else {
         await Context.Channel.SendMessageAsync($"Sad to see em go... {partner.Name} is no longer your partner.");
       }
       return;
     }
 
-    [Command("setprofile")]
-    [Alias("description", "profiledesc", "setdesc")]
-    public async Task SetDescription([Remainder] string input = null)
-    {
+    [Command("setprofile")] [Alias("description", "profiledesc", "setdesc")]
+    public async Task SetDescription([Remainder] string input = null) {
       UserObject user = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
       InventoryObject inv = MongoHelper.GetInventory(Context.User.Id.ToString()).Result;
-      if (input == null)
-      {
+      if (input == null) {
         await Context.Channel.SendMessageAsync($"<@{user.Id}> you may type a message 240 characters or less to use as a description, or type ``remove``, ``none`` or ``clear`` after the command to clear your description.");
         return;
       }
-      if (input == "remove" || input == "none" || input == "clear")
-      {
-        if (user.Description == "This user has not set a description.")
-        {
+      if (input == "remove" || input == "none" || input == "clear") {
+        if (user.Description == "This user has not set a description.") {
           await Context.Channel.SendMessageAsync($"You haven't set a description to be removed, <@{user.Id}>!");
           return;
         }
         await Context.Channel.SendMessageAsync($"Oh, you wanted your description removed? Okay, sure thing, your previous description below will be removed. <@{user.Id}>\n> {user.Description}");
         await MongoHelper.UpdateUser(user.Id, "Description", "This user has not set a description.");
         return;
-      }
-      else
-      {
-        if (input.Count() > 240)
-        {
+      } else {
+        if (input.Count() > 240) {
           await Context.Channel.SendMessageAsync($"Your description is too long! <@{user.Id}>, the maximum amount of characters is 240.\nYour character count was: {input.Count()}/240");
-          return;
-        }
-        else
-        {
+        } else {
           await Context.Channel.SendMessageAsync($"Alright, done! Your description has been updated, <@{user.Id}>!\n> {input}");
           await MongoHelper.UpdateUser(user.Id, "Description", input);
-          return;
         }
-
+        return;
       }
     }
 
-    [Group("leaderboard")]
-    [Alias("top")]
-    [RequireContext(ContextType.Guild)]
-    public class LeaderBoard : ModuleBase<SocketCommandContext>
-    {
+    [Group("leaderboard")] [Alias("top")] [RequireContext(ContextType.Guild)]
+    public class LeaderBoard : ModuleBase<SocketCommandContext> {
       [Command]
-      public async Task Default()
-      {
+      public async Task Default() {
         await Context.Channel.SendMessageAsync("Please specify either ``Money``/``Protobucks`` or ``Level``/``Levels``.");
       }
 
-      [Command("money")]
-      [Alias("Protobucks")]
-      public async Task MoneyBoard()
-      {
+      [Command("money")] [Alias("Protobucks")]
+      public async Task MoneyBoard() {
         var embed = new EmbedBuilder();
         string userlist = "";
         var index = 0;
@@ -679,8 +574,7 @@ namespace PrototonBot.Commands
 
         embed.WithTitle("PrototonBot Protobucks Leaderboard");
         embed.WithColor(0xB2A2F1);
-        foreach (var obj in MongoHelper.GetLeaderboardTopMoney().Result)
-        {
+        foreach (var obj in MongoHelper.GetLeaderboardTopMoney().Result) {
           index++;
           userlist += $"\n{index} - **{obj.Name}** with **{obj.Money}** Protobucks.";
         }
@@ -689,10 +583,8 @@ namespace PrototonBot.Commands
         await Context.Channel.SendMessageAsync("", false, embed.Build());
       }
 
-      [Command("level")]
-      [Alias("levels")]
-      public async Task LevelBoard()
-      {
+      [Command("level")] [Alias("levels")]
+      public async Task LevelBoard() {
         var embed = new EmbedBuilder();
         string userlist = "";
         var index = 0;
@@ -700,8 +592,7 @@ namespace PrototonBot.Commands
 
         embed.WithTitle("PrototonBot Level Leaderboard");
         embed.WithColor(0xB2A2F1);
-        foreach (var obj in MongoHelper.GetLeaderboardTopLevels().Result)
-        {
+        foreach (var obj in MongoHelper.GetLeaderboardTopLevels().Result) {
           index++;
           userlist += $"\n{index} - **{obj.Name}** who is level **{obj.Level}**.";
         }
@@ -710,6 +601,5 @@ namespace PrototonBot.Commands
         await Context.Channel.SendMessageAsync("", false, embed.Build());
       }
     }
-
   }
 }
