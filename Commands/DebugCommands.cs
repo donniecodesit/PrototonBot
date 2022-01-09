@@ -58,14 +58,14 @@ namespace PrototonBot.Commands {
       }
     }
     
-    //Developers can poke at a user's information on the server, such as [prefix]poke users id USERID Money 9999 Int32
+    //Developers can poke at a user's information on the server, such as [prefix]poke users id USERID Money 9999 long
     [Command("poke")] [Alias("write")]
     public async Task Poke(string collection, string searchkey, string searchvalue, string updatekey, string updatevalue, string updatetype) {
       if (UtilityHelper.IsUserDeveloper(Context.User.Id.ToString())) {
         if (!updatetype.Contains("System.")) updatetype = $"System.{updatetype}";
         var qualifiedTypeName = Type.GetType(updatetype)?.AssemblyQualifiedName;
         if (qualifiedTypeName == null) {
-          await Context.Channel.SendMessageAsync("The type of your poke is not valid.\nPlease match either `String`, `Int32`, or `Boolean`.");
+          await Context.Channel.SendMessageAsync("The type of your poke is not valid.\nPlease match the type of the key value in the database.");
           return;
         }
         switch (collection.ToLower()) {

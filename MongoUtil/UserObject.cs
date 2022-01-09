@@ -13,7 +13,7 @@ namespace PrototonBot.MongoUtil
     /// <summary>
     /// Money the User has.
     /// </summary>
-    public int Money { get; set; }
+    public long Money { get; set; }
     /// <summary>
     /// TimeStamp of the last time a Daily was claimed.
     /// </summary>
@@ -63,34 +63,6 @@ namespace PrototonBot.MongoUtil
     /// </summary>
     public bool Boosted { get; set; }
     /// <summary>
-    /// The amount of times the user committed Robbery.
-    /// </summary>
-    public int RobberyCount { get; set; }
-    /// <summary>
-    /// TimeStamp of the last time the user robbed someone.
-    /// </summary>
-    public long LastRobberyAt { get; set; }
-    /// <summary>
-    /// Number of times the user has been robbed.
-    /// </summary>
-    public int TimesRobbed { get; set; }
-    /// <summary>
-    /// Amount of money the user has robbed.
-    /// </summary>
-    public int MoneyRobbed { get; set; }
-    /// <summary>
-    /// Amount of money robbed from the user.
-    /// </summary>
-    public int MoneyLost { get; set; }
-    /// <summary>
-    /// Whether or not the user has an active shield.
-    /// </summary>
-    public bool RobShield { get; set; }
-    /// <summary>
-    /// How many uses the user's shield has left.
-    /// </summary>
-    public int RobShieldUses { get; set; }
-    /// <summary>
     /// TimeStamp of the last time the user Gambled.
     /// </summary>
     public long LastGamble { get; set; }
@@ -129,10 +101,10 @@ namespace PrototonBot.MongoUtil
     /// <summary>
     /// The amount of money the user received via transfers.
     /// </summary>
-    public int TransferIn { get; set; }
+    public long TransferIn { get; set; }
     /// <summary>
     /// The amount of money the user sent via transfers.
     /// </summary>
-    public int TransferOut { get; set; }
+    public long TransferOut { get; set; }
   }
 }

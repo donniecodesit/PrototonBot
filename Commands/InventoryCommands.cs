@@ -262,7 +262,7 @@ namespace PrototonBot.Commands
     }
 
     [Command("gamble")] [Alias("bet")]
-    public async Task GambleCommand(int bet = 0) {
+    public async Task GambleCommand(long bet = 0) {
       var user = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
       var inv = MongoHelper.GetInventory(Context.User.Id.ToString()).Result;
       var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -297,8 +297,8 @@ namespace PrototonBot.Commands
       }
 
       else {
-        var Bet3 = Math.Round((bet * 3) * GambleVariant);
-        var Bet2 = Math.Round((bet * 2) * GambleVariant);
+        long bet3 = (long) Math.Round((bet * 3) * GambleVariant);
+        long bet2 = (long) Math.Round((bet * 2) * GambleVariant);
         
         await MongoHelper.UpdateUser(user.Id, "LastGamble", currentTime);
         await MongoHelper.UpdateUser(user.Id, "Gambles", (user.Gambles + 1));
@@ -307,17 +307,17 @@ namespace PrototonBot.Commands
           await MongoHelper.UpdateInventory(user.Id, "GambleCoins", (inv.GambleCoins + 2));
           await MongoHelper.UpdateInventory(user.Id, "GambleCoinsTotal", (inv.GambleCoinsTotal + 2));
           await MongoHelper.UpdateUser(user.Id, "GamblesWon", (user.GamblesWon + 1));
-          await MongoHelper.UpdateUser(user.Id, "GamblesNetGain", ((user.GamblesNetGain - bet) + Bet3));
-          await MongoHelper.UpdateUser(user.Id, "Money", ((user.Money - bet) + Bet3));
-          await Context.Channel.SendMessageAsync($"Wow, you did great at the casino, <@{user.Id}>. You left with your {bet} Protobucks turning into {Bet3} (*3x*) Protobucks!\nYou also received 2 Gamble Coins!");
+          await MongoHelper.UpdateUser(user.Id, "GamblesNetGain", ((user.GamblesNetGain - bet) + bet3));
+          await MongoHelper.UpdateUser(user.Id, "Money", ((user.Money - bet) + bet3));
+          await Context.Channel.SendMessageAsync($"Wow, you did great at the casino, <@{user.Id}>.\nYou bet {bet} Protobacks and made a profit of {bet3 - bet} Protobucks!\nYou also received 2 Gamble Coins!");
         }
         else if (gambleChance >= 13 && gambleChance <= 37) {
           await MongoHelper.UpdateInventory(user.Id, "GambleCoins", (inv.GambleCoins + 1));
           await MongoHelper.UpdateInventory(user.Id, "GambleCoinsTotal", (inv.GambleCoinsTotal + 1));
           await MongoHelper.UpdateUser(user.Id, "GamblesWon", (user.GamblesWon + 1));
-          await MongoHelper.UpdateUser(user.Id, "GamblesNetGain", ((user.GamblesNetGain - bet) + Bet2));
-          await MongoHelper.UpdateUser(user.Id, "Money", ((user.Money - bet) + Bet2));
-          await Context.Channel.SendMessageAsync($"You seem to have done well at the casino, <@{user.Id}>. You left with your {bet} Protobucks turning into {Bet2} (*2x*) Protobucks!\nYou also received a Gamble Coin!");
+          await MongoHelper.UpdateUser(user.Id, "GamblesNetGain", ((user.GamblesNetGain - bet) + bet2));
+          await MongoHelper.UpdateUser(user.Id, "Money", ((user.Money - bet) + bet2));
+          await Context.Channel.SendMessageAsync($"You seem to have done well at the casino, <@{user.Id}>.\nYou bet {bet} Protobucks and made a profit of {bet2 - bet} Protobucks!\nYou also received a Gamble Coin!");
         }
         else if (gambleChance >= 38 && gambleChance <= 66) {
           await Context.Channel.SendMessageAsync($"<@{user.Id}>, although you had a bit of fun at the casino, you left keeping your {bet} Protobucks.");

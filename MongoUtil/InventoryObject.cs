@@ -14,8 +14,6 @@ namespace PrototonBot.MongoUtil
     public int DailyCoinsTotal { get; set; }
     public int PatCoins { get; set; }
     public int PatCoinsTotal { get; set; }
-    public int RobCoins { get; set; }
-    public int RobCoinsTotal { get; set; }
     public int HugCoins { get; set; }
     public int HugCoinsTotal { get; set; }
     public int GambleCoins { get; set; }

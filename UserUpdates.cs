@@ -15,9 +15,9 @@ namespace PrototonBot {
       if (user.LastMessage > (currentTime - 60)) return Task.CompletedTask;
       
       //Update the user's money. Multiply if mutual partners and/or boosted user.
-      double moneyToSet = random.Next(1, 8);
-      if (user.Mutuals && user.Boosted) moneyToSet = Math.Round(moneyToSet * 1.1);
-      else if (user.Mutuals || user.Boosted) moneyToSet = Math.Round(moneyToSet * 1.05);
+      long moneyToSet = random.Next(1, 8);
+      if (user.Mutuals && user.Boosted) moneyToSet = (long) Math.Round(moneyToSet * 1.1);
+      else if (user.Mutuals || user.Boosted) moneyToSet = (long) Math.Round(moneyToSet * 1.05);
       moneyToSet += user.Money;
 
       //Update the user's EXP. Multiply if mutual partners and/or boosted user.

@@ -122,13 +122,6 @@ namespace PrototonBot.MongoUtil
       userData.Partner = "None";
       userData.Mutuals = false;
       userData.Boosted = false;
-      userData.RobberyCount = 0;
-      userData.LastRobberyAt = 0;
-      userData.TimesRobbed = 0;
-      userData.MoneyRobbed = 0;
-      userData.MoneyLost = 0;
-      userData.RobShield = false;
-      userData.RobShieldUses = 0;
       userData.LastGamble = 0;
       userData.Gambles = 0;
       userData.GamblesWon = 0;
@@ -150,8 +143,6 @@ namespace PrototonBot.MongoUtil
       userInventory.DailyCoinsTotal = 0;
       userInventory.PatCoins = 0;
       userInventory.PatCoinsTotal = 0;
-      userInventory.RobCoins = 0;
-      userInventory.RobCoinsTotal = 0;
       userInventory.HugCoins = 0;
       userInventory.HugCoinsTotal = 0;
       userInventory.GambleCoins = 0;
