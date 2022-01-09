@@ -24,7 +24,7 @@ namespace PrototonBot.Commands {
       }
 
       double lovePercent = rand.Next(0, 101);
-      await Context.Channel.SendMessageAsync($"Consulting the love goddess.. {Context.User.Username} and {Context.Guild.GetUser(Convert.ToUInt64(filteredId)).Username} are {lovePercent}% in love!");
+      await Context.Channel.SendMessageAsync($"Consulting the love goddess.. {Context.User.Username} and {Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result.Username} are {lovePercent}% in love!");
       return;
     }
 
@@ -48,11 +48,11 @@ namespace PrototonBot.Commands {
       if (chanceOfHugCoin == 1) {
         await MongoHelper.UpdateInventory(Context.User.Id.ToString(), "HugCoins", (userInv.HugCoins + 1));
         await MongoHelper.UpdateInventory(Context.User.Id.ToString(), "HugCoinsTotal", (userInv.HugCoinsTotal + 1));
-        await Context.Channel.SendMessageAsync($"{Context.User.Username} gave {Context.Guild.GetUser(Convert.ToUInt64(filteredId)).Username} a big ol' stinkin' hug! So sweet! :heart: :heart:\nThey also got a Hug Coin for being kind!");
+        await Context.Channel.SendMessageAsync($"{Context.User.Username} gave {Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result.Username} a big ol' stinkin' hug! So sweet! :heart: :heart:\nThey also got a Hug Coin for being kind!");
         return;
       }
 
-      await Context.Channel.SendMessageAsync($"{Context.User.Username} gave {Context.Guild.GetUser(Convert.ToUInt64(filteredId)).Username} a big ol' stinkin' hug! So sweet! :heart: :heart:");
+      await Context.Channel.SendMessageAsync($"{Context.User.Username} gave {Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result.Username} a big ol' stinkin' hug! So sweet! :heart: :heart:");
       return;
     }
 
@@ -71,7 +71,7 @@ namespace PrototonBot.Commands {
         return;
       }
 
-      await Context.Channel.SendMessageAsync($"{Context.User.Username} gave {Context.Guild.GetUser(Convert.ToUInt64(filteredId)).Username} a sweet little nuzzle! Awee. :heart:");
+      await Context.Channel.SendMessageAsync($"{Context.User.Username} gave {Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result.Username} a sweet little nuzzle! Awee. :heart:");
       return;
     }
 
@@ -91,11 +91,11 @@ namespace PrototonBot.Commands {
       }
 
       if (input != null) {
-        await Context.Channel.SendMessageAsync($"{Context.Guild.GetUser(Convert.ToUInt64(filteredId)).Username}, you have been punished by {Context.User.Username} for {input}!");
+        await Context.Channel.SendMessageAsync($"{Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result.Username}, you have been punished by {Context.User.Username} for {input}!");
         return;
       }
 
-      await Context.Channel.SendMessageAsync($"{Context.Guild.GetUser(Convert.ToUInt64(filteredId)).Username}, you have been punished by {Context.User.Username} for being bad!");
+      await Context.Channel.SendMessageAsync($"{Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result.Username}, you have been punished by {Context.User.Username} for being bad!");
       return;
     }
 
@@ -114,7 +114,7 @@ namespace PrototonBot.Commands {
         return;
       }
 
-      await Context.Channel.SendMessageAsync($"{Context.Guild.GetUser(Convert.ToUInt64(filteredId)).Username}, you have been punished by {Context.User.Username} for being too **lewd*!");
+      await Context.Channel.SendMessageAsync($"{Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result.Username}, you have been punished by {Context.User.Username} for being too **lewd*!");
       return;
     }
 
@@ -133,7 +133,7 @@ namespace PrototonBot.Commands {
         return;
       }
 
-      await Context.Channel.SendMessageAsync($"{Context.Guild.GetUser(Convert.ToUInt64(filteredId)).Username} was given a cute slobber to the face by {Context.User.Username}! :tongue:");
+      await Context.Channel.SendMessageAsync($"{Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result.Username} was given a cute slobber to the face by {Context.User.Username}! :tongue:");
       return;
     }
 
@@ -151,7 +151,7 @@ namespace PrototonBot.Commands {
         return;
       }
 
-      await Context.Channel.SendMessageAsync($"{Context.Guild.GetUser(Convert.ToUInt64(filteredId)).Username} was yeeted into the oblivion by {Context.User.Username}! :wastebasket:");
+      await Context.Channel.SendMessageAsync($"{Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result.Username} was yeeted into the oblivion by {Context.User.Username}! :wastebasket:");
       return;
     }
 
