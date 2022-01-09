@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Discord.WebSocket;
 
 namespace PrototonBot.Commands {
   public class ProfileCommands : ModuleBase<SocketCommandContext> {
@@ -23,11 +24,12 @@ namespace PrototonBot.Commands {
         if (filteredId == null) return;
         user = MongoHelper.GetUser(filteredId).Result;
         inv = MongoHelper.GetInventory(filteredId).Result;
-      }
-
-      if (user == null || inv == null) {
-        await Context.Channel.SendMessageAsync($"<@{Context.User.Id}> sorry about this, but that user has no data yet. They need to have talked in a server I'm present in first.");
-        return;
+        if (user == null || inv == null) {
+          var userPost = Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result;
+          await MongoHelper.CreateUser(userPost);
+          user = MongoHelper.GetUser(filteredId).Result;
+          inv = MongoHelper.GetInventory(filteredId).Result;
+        }
       }
 
       double multiplier = 1;
@@ -95,11 +97,12 @@ namespace PrototonBot.Commands {
         if (filteredId == null) return;
         user = MongoHelper.GetUser(filteredId).Result;
         inv = MongoHelper.GetInventory(filteredId).Result;
-      }
-
-      if (user == null || inv == null) {
-        await Context.Channel.SendMessageAsync($"<@{Context.User.Id}> sorry about this, but that user has no data yet. They need to have talked in a server I'm present in first.");
-        return;
+        if (user == null || inv == null) {
+          var userPost = Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result;
+          await MongoHelper.CreateUser(userPost);
+          user = MongoHelper.GetUser(filteredId).Result;
+          inv = MongoHelper.GetInventory(filteredId).Result;
+        }
       }
 
       // Text read settings are modified, so they must be re-initialized every time.
@@ -233,11 +236,14 @@ namespace PrototonBot.Commands {
         if (filteredId == null) return;
         user = MongoHelper.GetUser(filteredId).Result;
         inv = MongoHelper.GetInventory(filteredId).Result;
+        if (user == null || inv == null) {
+          var userPost = Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result;
+          await MongoHelper.CreateUser(userPost);
+          user = MongoHelper.GetUser(filteredId).Result;
+          inv = MongoHelper.GetInventory(filteredId).Result;
+        }
       }
-      if (user == null || inv == null) {
-        await Context.Channel.SendMessageAsync($"<@{Context.User.Id}> sorry about this, but that user has no data yet. They need to have talked in a server I'm present in first.");
-        return;
-      }
+
       var embed = new EmbedBuilder();
       if (UtilityHelper.IsUserDeveloper(user.Id)) {
         embed.WithTitle($":star2: {user.Name}'s PrototonBot Bag :star2:");
@@ -314,9 +320,10 @@ namespace PrototonBot.Commands {
       var taggedUsr = MongoHelper.GetUser(filteredId).Result;
       var authorUsr = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
       var authorInv = MongoHelper.GetInventory(Context.User.Id.ToString()).Result;
-      if (authorUsr == null || taggedUsr == null || authorInv == null) {
-        await Context.Channel.SendMessageAsync($"<@{Context.User.Id}> sorry about this, but that user has no data yet. They need to have talked in a server I'm present in first.");
-        return;
+      if (taggedUsr == null) {
+        var userPost = Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result;
+        await MongoHelper.CreateUser(userPost);
+        taggedUsr = MongoHelper.GetUser(filteredId).Result;
       }
       
       var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -357,11 +364,14 @@ namespace PrototonBot.Commands {
         if (filteredId == null) return;
         user = MongoHelper.GetUser(filteredId).Result;
         inv = MongoHelper.GetInventory(filteredId).Result;
+        if (user == null || inv == null) {
+          var userPost = Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result;
+          await MongoHelper.CreateUser(userPost);
+          user = MongoHelper.GetUser(filteredId).Result;
+          inv = MongoHelper.GetInventory(filteredId).Result;
+        }
       }
-      if (user == null || inv == null) {
-        await Context.Channel.SendMessageAsync($"<@{Context.User.Id}> sorry about this, but that user has no data yet. They need to have talked in a server I'm present in first.");
-        return;
-      }
+
       var embed = new EmbedBuilder();
       if (UtilityHelper.IsUserDeveloper(user.Id)) {
         embed.WithTitle($":star2: {user.Name}'s Wallet :star2:");
@@ -394,8 +404,9 @@ namespace PrototonBot.Commands {
       user = MongoHelper.GetUser(filteredId).Result;
       author = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
       if (user == null) {
-        await Context.Channel.SendMessageAsync($"<@{Context.User.Id}> sorry about this, but that user has no data yet. They need to have talked in a server I'm present in first.");
-        return;
+        var userPost = Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result;
+        await MongoHelper.CreateUser(userPost);
+        user = MongoHelper.GetUser(filteredId).Result;
       }
 
       long moneySending = 0;
@@ -448,8 +459,9 @@ namespace PrototonBot.Commands {
       author = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
       partner = MongoHelper.GetUser(filteredId).Result;
       if (partner == null) {
-        await Context.Channel.SendMessageAsync($"<@{author.Id}> sorry about this, but that user has no data yet. They need to have talked in a server I'm present in first.");
-        return;
+        var userPost = Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result;
+        await MongoHelper.CreateUser(userPost);
+        partner = MongoHelper.GetUser(filteredId).Result;
       }
 
       if (author.Partner == filteredId) {
