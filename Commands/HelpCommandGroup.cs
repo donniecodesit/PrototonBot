@@ -124,7 +124,7 @@ namespace PrototonBot.Commands
         embed.WithDescription($"These are the Scenario Commands you can use with PrototonBot!\nThis server's prefix is set to: `{svr.Prefix}`");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithFooter("Thank you for using PrototonBot!");
-        embed.AddField("Scenario Commands", "•**8ball**\nGet a random answer to your question from an 8ball.\n•**mood**\nPrint out a completely random mood + emoji.\n•**roll**\nRoll a tabletop themed die of your choice.\n•**killing**\nGet a scenario of the Wulfonronpa Series Cast.\n•**killingRP**\nGet a scenario of the Wulfonronpa RP Cast.\n•**killingALL**\nGet a scenario of every cast listed above.", true);
+        embed.AddField("Scenario Commands", "•**8ball**\nGet a random answer to your question from an 8ball.\n•**mood**\nPrint out a completely random mood + emoji.\n•**roll**\nRoll a tabletop themed die of your choice.\n•**murdering**\nGet a scenario of the Wulfonronpa Series Cast.\n•**murdering-rp**\nGet a scenario of the Wulfonronpa RP Cast.\n•**murdering-all**\nGet a scenario of every cast listed above.", true);
         await Context.Channel.SendMessageAsync("", false, embed.Build());
       }
 
@@ -158,7 +158,7 @@ namespace PrototonBot.Commands
         embed.AddField("**Profile  Commands**", "`profile` `wallet` `inventory` `daily` `pat` `transfer` `setprofile` `leaderboard` `partnerup` `partnerdown`");
         embed.AddField("**Economy  Commands**", "`store` `upgrade` `buy` `chopdown` `mine` `salvage`");
         embed.AddField("**Media  Commands**", "`hope` `despair` `hope2` `despair2` `yasqueen` `yasqueen2` `kamakura` `explode`");
-        embed.AddField("**Scenario  Commands**", "`8ball` `mood` `roll` `killing` `killingRP` `killingALL`");
+        embed.AddField("**Scenario  Commands**", "`8ball` `mood` `roll` `murdering` `murdering-rp` `murdering-all`");
         embed.AddField("**Admin  Commands**", "`enable` `disable` `logchannel` `prefix` `privacy` `levelups` `togglewelcomes` `welcomechannel` `massrolecheck` `purge`");
         await Context.Channel.SendMessageAsync("", false, embed.Build());
       }
