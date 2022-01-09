@@ -172,7 +172,6 @@ namespace PrototonBot {
     //Runs when a user DMs the bot.
     public async Task OnDirectMessage(SocketMessage rawMessage) {
       await rawMessage.Channel.SendMessageAsync("PrototonBot is not used via DMs. Please use PrototonBot commands in a server.");
-      Console.WriteLine(client.Guilds.Count());
     }
 
     //Runs when the bot joins a server.
