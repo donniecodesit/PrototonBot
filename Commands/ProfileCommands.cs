@@ -142,11 +142,13 @@ namespace PrototonBot.Commands {
       canvas.Composite(new MagickImage($"caption:{discordUser.Username}#{discordUser.Discriminator}", textSettings), 341, 19, CompositeOperator.Over);
 
       // Calculate experience stuff.
-      var expForCurrent = ((20d * user.Level) * ((31d * user.Level) - 17d)) / 3d;
+      var expForCurrent = (user.Level == 0) ? 0 : ((20d * user.Level) * ((31d * user.Level) - 17d)) / 3d;
       var expForNext = ((20d * (user.Level + 1d)) * ((31d * (user.Level + 1d)) - 17d)) / 3d;
       var expToNext = expForNext - user.EXP;
       var expOffset = user.EXP - expForCurrent;
       var expPercent = expOffset / (expForNext - expForCurrent);
+      //It will not crop to 0, so I'll crop it to the smallest possible.
+      if(expPercent == 0) expPercent = 0.01;
 
       // Clone, crop, and composite the experience bar on.
       var userExperience = ExperienceBar.Clone();
