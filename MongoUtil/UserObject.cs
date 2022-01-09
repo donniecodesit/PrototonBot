@@ -29,7 +29,7 @@ namespace PrototonBot.MongoUtil
     /// <summary>
     /// Experience the User has.
     /// </summary>
-    public int EXP { get; set; }
+    public long EXP { get; set; }
     /// <summary>
     /// TimeStamp of the last message that counted towards minuteMoney + XP
     /// </summary>

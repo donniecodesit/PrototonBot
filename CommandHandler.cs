@@ -148,7 +148,7 @@ namespace PrototonBot {
                 return;
             }
             case CommandError.BadArgCount: {
-                await context.Channel.SendMessageAsync("Sorry, but that command wasn't used correctly. Try {server.Prefix}help to learn more.");
+                await context.Channel.SendMessageAsync($"Sorry, but that command wasn't used correctly. Try {server.Prefix}help to learn more.");
                 return;
             }
             case CommandError.ParseFailed: {
