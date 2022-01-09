@@ -45,13 +45,13 @@ namespace PrototonBot.Commands
       if (UtilityHelper.IsUserDeveloper(user.Id))
       {
         embed.WithTitle($":star2: {user.Name}'s PrototonBot Profile :star2:");
-        embed.WithColor(0xFFFF00);
+        embed.WithColor(0xB285FE);
         embed.WithDescription($"This user is a developer for PrototonBot!\n{user.Description}");
       }
       else
       {
         embed.WithTitle(user.Name);
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
         embed.WithDescription($"{user.Description}");
       }
 
@@ -271,12 +271,12 @@ namespace PrototonBot.Commands
       if (UtilityHelper.IsUserDeveloper(user.Id))
       {
         embed.WithTitle($":star2: {user.Name}'s PrototonBot Bag :star2:");
-        embed.WithColor(0xFFFF00);
+        embed.WithColor(0xB285FE);
       }
       else
       {
         embed.WithTitle($"{user.Name}'s PrototonBot Bag");
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
       }
       
       embed.WithThumbnailUrl(Context.Guild.GetUser(Convert.ToUInt64(user.Id.ToString())).GetAvatarUrl());
@@ -311,7 +311,7 @@ namespace PrototonBot.Commands
 
 
         var dailyRejected = new EmbedBuilder();
-        dailyRejected.WithColor(0xFF00FF);
+        dailyRejected.WithColor(0xB2A2F1);
         dailyRejected.AddField("Daily Already Claimed!", $"<@{user.Id}>, You've already claimed your daily today!\nGet your next one in {str}");
         dailyRejected.WithThumbnailUrl(Context.User.GetAvatarUrl());
 
@@ -326,7 +326,7 @@ namespace PrototonBot.Commands
       await MongoHelper.UpdateInventory(user.Id, "DailyCoinsTotal", (inv.DailyCoinsTotal + 1));
 
       var dailySuccess = new EmbedBuilder();
-      dailySuccess.WithColor(0xFF00FF);
+      dailySuccess.WithColor(0xB2A2F1);
       dailySuccess.AddField("Daily Claimed!", $"<@{user.Id}>, you have received **{500 + user.DailyBonus}** Protobucks as a daily reward!\nYou now have **{user.Money + 500 + user.DailyBonus}** Protobucks, and received 1 Daily Coin.");
       dailySuccess.WithThumbnailUrl(Context.User.GetAvatarUrl());
 
@@ -366,7 +366,7 @@ namespace PrototonBot.Commands
         string str = spanOfTime.Hours + " hours, " + spanOfTime.Minutes + " minutes, and " + spanOfTime.Seconds + " seconds!";
 
         var dailyPatRejected = new EmbedBuilder();
-        dailyPatRejected.WithColor(0xFF00FF);
+        dailyPatRejected.WithColor(0xB2A2F1);
         dailyPatRejected.AddField("Pat Already Claimed!", $"<@{authorUsr.Id}>, you've already given a pat today!\nYou can give another one in {str}");
         await Context.Channel.SendMessageAsync("", false, dailyPatRejected.Build());
         return;
@@ -380,7 +380,7 @@ namespace PrototonBot.Commands
       await MongoHelper.UpdateUser(taggedUsr.Id, "PatsReceived", (taggedUsr.PatsReceived + 1));
 
       var PatSuccess = new EmbedBuilder();
-      PatSuccess.WithColor(0xFF00FF);
+      PatSuccess.WithColor(0xB2A2F1);
       PatSuccess.AddField("Pat Success!", $"{taggedUsr.Name} has received a pat! <3\n{authorUsr.Name} also received 1 Pat Coin!");
       await Context.Channel.SendMessageAsync("", false, PatSuccess.Build());
     }
@@ -411,12 +411,12 @@ namespace PrototonBot.Commands
       if (UtilityHelper.IsUserDeveloper(user.Id))
       {
         embed.WithTitle($":star2: {user.Name}'s Wallet :star2:");
-        embed.WithColor(0xFFFF00);
+        embed.WithColor(0xB285FE);
       }
       else
       {
         embed.WithTitle($"{user.Name}'s Wallet");
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
       }
 
       embed.AddField("Account Holder", user.Name, true);
@@ -678,7 +678,7 @@ namespace PrototonBot.Commands
         var TotalUsers = MongoHelper.GetTotalUserCount().Result.Count();
 
         embed.WithTitle("PrototonBot Protobucks Leaderboard");
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
         foreach (var obj in MongoHelper.GetLeaderboardTopMoney().Result)
         {
           index++;
@@ -699,7 +699,7 @@ namespace PrototonBot.Commands
         var TotalUsers = MongoHelper.GetTotalUserCount().Result.Count();
 
         embed.WithTitle("PrototonBot Level Leaderboard");
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
         foreach (var obj in MongoHelper.GetLeaderboardTopLevels().Result)
         {
           index++;

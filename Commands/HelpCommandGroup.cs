@@ -15,48 +15,39 @@ namespace PrototonBot.Commands
     [Group("help")]
     [Alias("commands")]
     [RequireContext(ContextType.Guild)]
-    public class HelpCommand : ModuleBase<SocketCommandContext>
-    {
+    public class HelpCommand : ModuleBase<SocketCommandContext> {
       [Command]
-      public async Task Default()
-      {
+      public async Task Default() {
         var embed = new EmbedBuilder();
         var svr = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
         embed.WithTitle("PrototonBot Command Menu");
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
         embed.WithDescription($"These are the categories of commands you can use with PrototonBot!\nThis server's prefix is set to: `{svr.Prefix}`\nTo view a category, type `{svr.Prefix}help CATEGORYNAME`.\n If you want a simple version of this menu, do `{svr.Prefix}commands simple`.");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithFooter("Thank you for using PrototonBot!");
         embed.AddField("Categories", "1. **general** - General Commands\n2. **fun** - Fun/Action Commands\n3. **profile** - Profiling Commands\n4. **economy** - Economy Commands\n5. **media** - Image & Video commands\n6. **scenario** - RNG Scenario Commands\n7. **admin** - Administrative Commands (Admins Only)", true);
-
         await Context.Channel.SendMessageAsync("", false, embed.Build());
       }
 
-      [Command("general")]
-      [Alias("1")]
-      public async Task CommGeneralPage()
-      {
+      [Command("general")] [Alias("1")]
+      public async Task CommGeneralPage() {
         var embed = new EmbedBuilder();
         var svr = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
-
         embed.WithTitle("PrototonBot General Commands");
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
         embed.WithDescription($"These are the General Commands you can use with PrototonBot!\nThis server's prefix is set to: `{svr.Prefix}`");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithFooter("Thank you for using PrototonBot!");
-        embed.AddField("General Commands", "•**info** (*botinfo*)\nGet a short bit of information about PrototonBot, and it's creators.\n•**serverinfo**\nGet some information about this very server.\n•**help**\nView the categories, descriptions, and aliases of every command.\n•**botinvite** (*invite*, *invitebot*)\nGet a link to invite PrototonBot to your own server.", true);
+        embed.AddField("General Commands", "•**info** (*botinfo*)\nGet some information about the bot and links!\n•**serverinfo**\nGet some information about this very server.\n•**help**\nView the categories, descriptions, and aliases of every command.\n•**simonsays**\nGet a response of what you said.\n•**ping***\nUhhh... pong?", true);
         await Context.Channel.SendMessageAsync("", false, embed.Build());
       }
 
-      [Command("fun")]
-      [Alias("2")]
-      public async Task CommFunPage()
-      {
+      [Command("fun")] [Alias("2")]
+      public async Task CommFunPage() {
         var embed = new EmbedBuilder();
         var svr = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
-
         embed.WithTitle("PrototonBot Fun & Action Commands");
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
         embed.WithDescription($"These are the Fun & Action Commands you can use with PrototonBot!\nThis server's prefix is set to: `{svr.Prefix}`");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithFooter("Thank you for using PrototonBot!");
@@ -64,15 +55,12 @@ namespace PrototonBot.Commands
         await Context.Channel.SendMessageAsync("", false, embed.Build());
       }
 
-      [Command("profile")]
-      [Alias("3")]
-      public async Task CommProfilePage()
-      {
+      [Command("profile")] [Alias("3")]
+      public async Task CommProfilePage() {
         var embed = new EmbedBuilder();
         var svr = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
-
         embed.WithTitle("PrototonBot Profiling Commands");
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
         embed.WithDescription($"These are the Profiling Commands you can use with PrototonBot!\nThis server's prefix is set to: `{svr.Prefix}`");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithFooter("Thank you for using PrototonBot!");
@@ -80,15 +68,12 @@ namespace PrototonBot.Commands
         await Context.Channel.SendMessageAsync("", false, embed.Build());
       }
 
-      [Command("economy")]
-      [Alias("4")]
-      public async Task CommEconomyPage()
-      {
+      [Command("economy")] [Alias("4")]
+      public async Task CommEconomyPage() {
         var embed = new EmbedBuilder();
         var svr = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
-
         embed.WithTitle("PrototonBot Economy Commands");
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
         embed.WithDescription($"These are the Economy Commands you can use with PrototonBot!\nThis server's prefix is set to: `{svr.Prefix}`");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithFooter("Thank you for using PrototonBot!");
@@ -96,15 +81,12 @@ namespace PrototonBot.Commands
         await Context.Channel.SendMessageAsync("", false, embed.Build());
       }
 
-      [Command("media")]
-      [Alias("5")]
-      public async Task CommMediaPage()
-      {
+      [Command("media")] [Alias("5")]
+      public async Task CommMediaPage() {
         var embed = new EmbedBuilder();
         var svr = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
-
         embed.WithTitle("PrototonBot Image & Video Commands");
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
         embed.WithDescription($"These are the Image & Video Commands you can use with PrototonBot!\nThis server's prefix is set to: `{svr.Prefix}`");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithFooter("Thank you for using PrototonBot!");
@@ -112,15 +94,12 @@ namespace PrototonBot.Commands
         await Context.Channel.SendMessageAsync("", false, embed.Build());
       }
 
-      [Command("scenario")]
-      [Alias("6")]
-      public async Task CommScenarioPage()
-      {
+      [Command("scenario")] [Alias("6")]
+      public async Task CommScenarioPage() {
         var embed = new EmbedBuilder();
         var svr = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
-
         embed.WithTitle("PrototonBot Scenario Commands");
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
         embed.WithDescription($"These are the Scenario Commands you can use with PrototonBot!\nThis server's prefix is set to: `{svr.Prefix}`");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithFooter("Thank you for using PrototonBot!");
@@ -128,15 +107,12 @@ namespace PrototonBot.Commands
         await Context.Channel.SendMessageAsync("", false, embed.Build());
       }
 
-      [Command("admin")]
-      [Alias("7")]
-      public async Task CommAdminPage()
-      {
+      [Command("admin")] [Alias("7")]
+      public async Task CommAdminPage() {
         var embed = new EmbedBuilder();
         var svr = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
-
         embed.WithTitle("PrototonBot Administrative Commands");
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
         embed.WithDescription($"These are the Administrative you can use with PrototonBot!\n*Admins can use commands anywhere, but you must have ManageChannel permissions to use these!*\nThis server's prefix is set to: `{svr.Prefix}`");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithFooter("Thank you for using PrototonBot!");
@@ -144,16 +120,14 @@ namespace PrototonBot.Commands
         await Context.Channel.SendMessageAsync("", false, embed.Build());
       }
 
-      [Command("simplified")]
-      [Alias("simple", "list")]
-      public async Task SimplifiedCommands()
-      {
+      [Command("simplified")] [Alias("simple", "list")]
+      public async Task SimplifiedCommands() {
         var embed = new EmbedBuilder();
         var svr = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
         embed.WithTitle("PrototonBot Commands");
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
         embed.WithDescription($"Server Prefix: `{svr.Prefix}`");
-        embed.AddField("**General Commands**", "`info` `serverinfo` `help` `botinvite`");
+        embed.AddField("**General Commands**", "`info` `serverinfo` `help` `simonsays`");
         embed.AddField("**Fun  Commands**", "`hug` `nuzzle` `ship` `loveme` `noticeme` `coinflip` `punish` `lewdpunish` `yeet` `lick` `gamble` `she`");
         embed.AddField("**Profile  Commands**", "`profile` `wallet` `inventory` `daily` `pat` `transfer` `setprofile` `leaderboard` `partnerup` `partnerdown`");
         embed.AddField("**Economy  Commands**", "`store` `upgrade` `buy` `chopdown` `mine` `salvage`");

@@ -11,8 +11,7 @@ namespace PrototonBot.Commands
 {
   [RequireContext(ContextType.Guild)]
   [RequireUserPermission(GuildPermission.Administrator)]
-  public class AdminCommands : ModuleBase<SocketCommandContext>
-  {
+  public class AdminCommands : ModuleBase<SocketCommandContext> {
     [Command("enablechannel")]
     [Alias("enable", "addchannel")]
     public async Task EnableChannelAsync(string channelCalled = null) {

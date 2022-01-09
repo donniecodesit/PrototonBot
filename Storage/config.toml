@@ -1,14 +1,13 @@
 DiscordToken = "DiscordTokenHere"
-
-EnableBotList = false
-BotListToken = "BotListTokenHere"
-MongoURL = "mongodb://localhost"
-
-MasterSvr = "HomeServerIDHere"
 UserID = "BotUserIDHere"
-CacheDir = "/tmp/prototon"
-
+MasterSvr = "HomeServerIDHere"
+GitHubRepoURL = "RepoURLHere"
+MongoURL = "mongodb://localhost"
 DeveloperIDs = [
     "285937628363227138",
     "459402945792966658"
 ]
+
+EnableBotList = false
+BotListToken = "BotListTokenHere"
+CacheDir = "/tmp/prototon"

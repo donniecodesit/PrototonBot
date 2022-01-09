@@ -21,7 +21,7 @@ namespace PrototonBot.Commands
       if (page == null)
       {
         var embed = new EmbedBuilder();
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
         embed.WithTitle("PrototonBot Store Directory");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithDescription("PrototonBot has different store pages you can view! Which one do you want?");
@@ -35,7 +35,7 @@ namespace PrototonBot.Commands
         if (serverObj.Id == Program.MasterSvr)
         {
           var embed = new EmbedBuilder();
-          embed.WithColor(0xFF00FF);
+          embed.WithColor(0xB2A2F1);
           embed.WithTitle("PrototonBot Store - Page 1");
           embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
           embed.WithFooter($"Replying to: {Context.User.Username}");
@@ -48,7 +48,7 @@ namespace PrototonBot.Commands
         else
         {
           var embed = new EmbedBuilder();
-          embed.WithColor(0xFF00FF);
+          embed.WithColor(0xB2A2F1);
           embed.WithTitle("PrototonBot Store - Page 1");
           embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
           embed.WithFooter($"Replying to: {Context.User.Username}");
@@ -62,7 +62,7 @@ namespace PrototonBot.Commands
       if (page == "2")
       {
         var embed = new EmbedBuilder();
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
         embed.WithTitle("PrototonBot Store - Page 2");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithFooter($"Replying to: {Context.User.Username}");
@@ -210,7 +210,7 @@ namespace PrototonBot.Commands
       if (item == null || item == "shop")
       {
         var embed = new EmbedBuilder();
-        embed.WithColor(0xFF00FF);
+        embed.WithColor(0xB2A2F1);
         embed.WithTitle("PrototonBot Upgrade Shop");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithDescription($"Hey! Welcome to the super magic Upgrade Shop! We take those amazing coins you've earned from using our services and infuse them with your profile to give you better statistics all around! Currently, we provide 2 stats. <@{user.Id}>");
