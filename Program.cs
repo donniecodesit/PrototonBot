@@ -7,6 +7,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Nett;
+using System.Collections.Generic;
 
 namespace PrototonBot {
   public class Program {
@@ -36,12 +37,14 @@ namespace PrototonBot {
       catch (FileNotFoundException) {
         config = Toml.Create();
         config.Add("DiscordToken", "InsertTokenHere");
+        config.Add("UserID", "InsertIDHere");
+        config.Add("MasterSvr", "ServerIDHere");
+        config.Add("GitHubRepoURL", "RepoURLHere");
+        config.Add("MongoURL", "mongodb://localhost");
+        config.Add("DeveloperIDs", new List<string>());
         config.Add("EnableBotList", false);
         config.Add("BotListToken", "InsertTokenHere");
-        config.Add("MongoURL", "mongodb://localhost");
-        config.Add("UserID", "InsertIDHere");
         config.Add("CacheDir", "/tmp/protobot");
-        config.Add("MasterSvr", "ServerIDHere");
         Toml.WriteFile(config, Path.Combine("Storage", "config.toml"));
         Console.WriteLine("Add your token to Storage/config.toml and restart the bot.");
         return;
