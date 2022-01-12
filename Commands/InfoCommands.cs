@@ -47,9 +47,9 @@ namespace PrototonBot.Commands
     [Command("info")] [Alias("botinfo")]
     public async Task BotInfo() {
       var serverObj = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
-      TomlTable config = Toml.ReadFile(Path.Combine("Storage", "config.toml"));
-      var githubPage = config.Get<string>("GitHubRepoURL");
-      var gitValid = githubPage.Contains("github.com");
+      var repo = Program.GitHubRepoURL;
+      var gitValid = (repo != "RepoURLHere" && repo != "" );
+
       var embed = new EmbedBuilder();
       embed.WithColor(0xB2A2F1);
       embed.WithTitle("Welcome to PrototonBot!");
@@ -59,7 +59,7 @@ namespace PrototonBot.Commands
       embed.AddField("Default Prefix", $"Global: pr.\nHere: {serverObj.Prefix}", true);
       embed.AddField("Servers", $"\nServers: {Context.Client.Guilds.Count}", true);
       embed.AddField("Features", "**TBA**", true);
-      if (gitValid) embed.AddField("Github", $"[GitHub Page]({githubPage})", true);
+      if (gitValid) embed.AddField("Git Repo", $"[Git Repo Page]({repo})", true);
       embed.AddField("Invite Bot", $"[Invite Link](https://discord.com/oauth2/authorize?client_id={Program.UserID}&permissions=8&scope=bot)", true);
       embed.WithFooter($"{((gitValid) ? "You can report bugs/issues to the GitHub Page's Issues Tab" : "")}\nBuilt with Visual Studio Code and Discord.Net");
       await Context.Channel.SendMessageAsync("", false, embed.Build());
