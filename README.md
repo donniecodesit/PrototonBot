@@ -7,6 +7,8 @@
 
 *Click [here](https://discord.com/oauth2/authorize?client_id=919110017142095914&permissions=8&scope=bot) to invite PrototonBot to your server. :)*
 
+*ProtogenBot's current icon was made via [Mod's Protogen Creator](https://picrew.me/image_maker/362292)*
+
 PrototonBot is the successor to ShepherdBot Classic, a Discord Bot written by [Donovan Laws](https://github.com/donovanlaws).
 The previous bot had been written in JavaScript and was later rewritten and improved in 2020 in C# with Discord.Net.
 The old bot has been since discontinued and is now being completely revised and renewed as of 2022, using everything I've learned about programming so far.
@@ -50,6 +52,7 @@ For now, each of them will remain anonymous unless they request to be added to t
 - Thank you to the one who has helped consistently with the bot's programming and server setup. 💜
 - Thank you to the one who helped implement a few commands and also gave some general tips and advice. 💙
 - Thank you to the one who has been the morale support and curious one with the bot. 🧡
+- *ProtogenBot's current icon was made via [Mod's Protogen Creator](https://picrew.me/image_maker/362292)*
 
 If you want to contribute or help, please feel free to join our [TO_BE_ADDED_SERVER](https://discord.com) and ask for help/feedback in the support section.
 Or you can provide ideas, thoughts, feedback, or contributions to the features section.
