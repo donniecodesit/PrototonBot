@@ -1,4 +1,7 @@
-<img alt="PrototonBot" src="https://i.imgur.com/2aCduA6.png"/>
+<div align="center">
+   <img alt="PrototonBot" src="https://i.imgur.com/2aCduA6.png"/>
+   <img alt="Discord" src="https://img.shields.io/discord/919135423090024499?color=%238D59FF&label=Discord%20Support%20Server">
+</div>
 
 # What is Prototon Bot?
 
