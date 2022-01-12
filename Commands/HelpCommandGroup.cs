@@ -38,7 +38,7 @@ namespace PrototonBot.Commands
         embed.WithDescription($"These are the General Commands you can use with PrototonBot!\nThis server's prefix is set to: `{svr.Prefix}`");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithFooter("Thank you for using PrototonBot!");
-        embed.AddField("General Commands", "•**info** (*botinfo*)\nGet some information about the bot and links!\n•**serverinfo**\nGet some information about this very server.\n•**help**\nView the categories, descriptions, and aliases of every command.\n•**simonsays**\nGet a response of what you said.\n•**ping***\nUhhh... pong?", true);
+        embed.AddField("General Commands", "•**info** (*botinfo*)\nGet some information about the bot and links!\n•**serverinfo**\nGet some information about this very server.\n•**help**\nView the categories, descriptions, and aliases of every command.\n•**simonsays**\nGet a response of what you said.\n•**ping***\nUhhh... pong?\n•**botinvite**\nReceive an invite link for the bot!", true);
         await Context.Channel.SendMessageAsync("", false, embed.Build());
       }
 
@@ -127,7 +127,7 @@ namespace PrototonBot.Commands
         embed.WithTitle("PrototonBot Commands");
         embed.WithColor(0xB2A2F1);
         embed.WithDescription($"Server Prefix: `{svr.Prefix}`");
-        embed.AddField("**General Commands**", "`info` `serverinfo` `help` `simonsays`");
+        embed.AddField("**General Commands**", "`info` `serverinfo` `help` `simonsays` `ping` `botinvite`");
         embed.AddField("**Fun  Commands**", "`hug` `nuzzle` `ship` `loveme` `noticeme` `coinflip` `punish` `lewdpunish` `yeet` `lick` `gamble` `she`");
         embed.AddField("**Profile  Commands**", "`profile` `wallet` `inventory` `daily` `pat` `transfer` `setprofile` `leaderboard` `partnerup` `partnerdown`");
         embed.AddField("**Economy  Commands**", "`store` `upgrade` `buy` `chopdown` `mine` `salvage`");

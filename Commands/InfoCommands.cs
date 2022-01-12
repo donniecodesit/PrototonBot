@@ -78,6 +78,18 @@ namespace PrototonBot.Commands
       await Context.Channel.SendMessageAsync("", false, embed.Build());
     }
 
+    //Reply with embedded invite
+    [Command("botinvite")]
+    public async Task BotInvite() {
+      var embed = new EmbedBuilder();
+      embed.WithTitle("Want to invite the bot?");
+      embed.WithColor(0xB2A2F1);
+      embed.WithDescription("Hey, appreciated! All shares and invites of the bot are encouraged, as it helps the bot grow and also increases possibilities for us to find bugs and problems! :)\nClick the blue hyperlink above to invite!");
+      embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
+      embed.WithUrl($"https://discord.com/oauth2/authorize?client_id={Program.UserID}&permissions=8&scope=bot");
+      await Context.Channel.SendMessageAsync("", false, embed.Build());
+    }
+
     //Reply with the user's input
     [Command("simonsays")]
     public async Task SimonSays([Remainder] string input) {
