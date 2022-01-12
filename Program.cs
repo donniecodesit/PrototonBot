@@ -19,6 +19,8 @@ namespace PrototonBot {
     public static ulong UserID;
     public static string CacheDir;
     public static string MasterSvr;
+    public static string GitHubRepoURL;
+
 
     static void Main(string[] args) {
       new Program().AsyncStart().GetAwaiter().GetResult();
@@ -33,8 +35,7 @@ namespace PrototonBot {
       TomlTable config = null;
       try {
         config = Toml.ReadFile(Path.Combine("Storage", "config.toml"));
-      }
-      catch (FileNotFoundException) {
+      } catch (FileNotFoundException) {
         config = Toml.Create();
         config.Add("DiscordToken", "InsertTokenHere");
         config.Add("UserID", "InsertIDHere");
@@ -57,15 +58,11 @@ namespace PrototonBot {
         UserID = ulong.Parse(config.Get<string>("UserID"));
         CacheDir = config.Get<string>("CacheDir");
         MasterSvr = config.Get<string>("MasterSvr");
+        GitHubRepoURL = config.Get<string>("GitHubRepoURL");
 
         client = services.GetRequiredService<DiscordSocketClient>();
         services.GetRequiredService<CommandService>().Log += Log;
         client.Log += Log;
-        Console.CancelKeyPress += delegate {
-          client.LogoutAsync();
-          client.StopAsync();
-          Environment.Exit(0);
-        };
         await client.LoginAsync(TokenType.Bot, DiscordToken);
         await client.StartAsync();
         await services.GetRequiredService<CommandHandler>().InitializeAsync();
@@ -74,18 +71,28 @@ namespace PrototonBot {
     }
 
     private ServiceProvider ConfigureServices() {
+      var socketConfig = new DiscordSocketConfig {
+          GatewayIntents = 
+          GatewayIntents.DirectMessageReactions
+          | GatewayIntents.DirectMessages
+          | GatewayIntents.DirectMessageTyping
+          | GatewayIntents.GuildBans
+          | GatewayIntents.GuildEmojis
+          | GatewayIntents.GuildIntegrations
+          | GatewayIntents.GuildMembers
+          | GatewayIntents.GuildMessageReactions
+          | GatewayIntents.GuildMessages
+          | GatewayIntents.GuildMessageTyping
+          | GatewayIntents.Guilds
+          | GatewayIntents.GuildVoiceStates
+          | GatewayIntents.GuildWebhooks
+      };
       return new ServiceCollection()
-          .AddSingleton<DiscordSocketClient>()
+          .AddSingleton<DiscordSocketClient>(new DiscordSocketClient(socketConfig))
           .AddSingleton<CommandService>()
           .AddSingleton<CommandHandler>()
           .AddSingleton<HttpClient>()
           .BuildServiceProvider();
-    }
-
-    public static async void ShutDown() {
-      await client.LogoutAsync();
-      await client.StopAsync();
-      Environment.Exit(0);
     }
   }
 }

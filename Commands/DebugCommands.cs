@@ -9,15 +9,6 @@ using System.Linq;
 
 namespace PrototonBot.Commands {
   public class DebugCommands : ModuleBase<SocketCommandContext> {
-    //Developers can force a restart with this command, but it's only a restart and not a rebuild.
-    [Command("restartbot")]
-    public async Task BotRestart() {
-      if (UtilityHelper.IsUserDeveloper(Context.User.Id.ToString())) {
-        await Context.Channel.SendMessageAsync("Shutting down the bot.");
-        Program.ShutDown();
-      }
-    }
-
     //Developers can peek at a user's information on the server, such as [prefix]peek users id USERID
     [Command("peek")] [Alias("read")]
     public async Task Peek(string collection, string searchkey, [Remainder] string searchvalue) {
