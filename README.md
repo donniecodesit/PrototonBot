@@ -69,4 +69,5 @@ I do not mind users using this bot, please use and follow the same license agree
 
 ## License
 This project is licensed under the Creative Commons BY-NC-SA 4.0 License.
+
 You can read about the license [here](https://creativecommons.org/licenses/by-nc-sa/4.0), or the full license text in [license.txt](https://github.com/donovanlaws/PrototonBot/blob/main/license.txt).
