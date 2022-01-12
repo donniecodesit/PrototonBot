@@ -65,7 +65,6 @@ namespace PrototonBot {
 
     //Runs whenever an unhandled error occurs.
     private async Task OnError(ICommandContext context, IUserMessage message, IResult result) {
-      await context.Channel.SendMessageAsync($"Sorry, that command didn't work. Double check that you used it properly.");
       var embed = new EmbedBuilder()
         .WithTitle("Unhandled Exception")
         .WithDescription("An unhandled exception was encountered during runtime:")
@@ -74,7 +73,14 @@ namespace PrototonBot {
         .AddField("Guild", $"`{context.Guild.Name}`")
         .AddField("Timestamp", $"`{DateTime.Now:yyyy-MM-dd hh:mm:ss}`")
         .AddField("Command", $"`{message.Content}`")
-        .AddField("Result", $"`{result.Error}: {result.ErrorReason}`");
+        .AddField("Result", $"`{result.Error}: {result.ErrorReason}`")
+        .WithFooter("Please send a screenshot of this to the developers");
+        try { 
+          await client.GetUserAsync(message.Author.Id).Result.SendMessageAsync(null, false, embed.Build());
+          await context.Channel.SendMessageAsync("Something critical occured. I DMed you the error.");
+        } catch {
+          await context.Channel.SendMessageAsync("Something critical occured.. I am unable to reach your DMs.");
+        }
     }
 
     //Runs on every single message seen.
@@ -145,23 +151,23 @@ namespace PrototonBot {
         if (!result.IsSuccess) {
           switch (result.Error) {
             case CommandError.UnknownCommand: {
-                return;
+              return;
             }
             case CommandError.BadArgCount: {
-                await context.Channel.SendMessageAsync($"Sorry, but that command wasn't used correctly. Try {server.Prefix}help to learn more.");
-                return;
+              await context.Channel.SendMessageAsync($"Sorry, but that command wasn't used correctly. Try {server.Prefix}help to learn more.");
+              return;
             }
             case CommandError.ParseFailed: {
-                await context.Channel.SendMessageAsync("Sorry, but I wasn't able to understand that. Please try again with normal text.");
-                return;
+              await context.Channel.SendMessageAsync("Sorry, but I wasn't able to understand that. Please try again with normal text.");
+              return;
             }
             case CommandError.UnmetPrecondition: {
-                await context.Channel.SendMessageAsync("This command only works for users with the **Administrator** permission."); 
-                return;
+              await context.Channel.SendMessageAsync("This command only works for users with the **Administrator** permission."); 
+              return;
             }
             default: {
-                await OnError(context, message, result);
-                return;
+              await OnError(context, message, result);
+              return;
             }
           }
         }
@@ -180,9 +186,21 @@ namespace PrototonBot {
       await UpdateDBL();
       //Create the server info in the database.
       await MongoHelper.CreateServer(server);
+      var svrDB = MongoHelper.GetServer(server.Id.ToString()).Result;
+
+      var embed = new EmbedBuilder();
+      embed.WithTitle("Thank you for inviting me!");
+      embed.WithColor(0xB2A2F1);
+      embed.WithThumbnailUrl(client.GetUserAsync(Program.UserID).Result.GetAvatarUrl());
+      embed.AddField("Quick Tip:", $"An admin will need to enable a channel before users can use commands anywhere. Check out `{svrDB.Prefix}help` to learn more about commands and configuring this bot!\nAdmins: Enable a channel using `{svrDB.Prefix}enable #channel`. (or the channel ID.)", true);
+      embed.WithFooter("Admins in this case are considered anyone with the ManageChannel permission.");
+
       SocketGuild newServer = server as SocketGuild;
-      var svrDB = MongoHelper.GetServer(newServer.Id.ToString()).Result;
-      await newServer.SystemChannel.SendMessageAsync($">>> Thank you for inviting me to this server! :purple_heart:\nAn administrator can learn what they can set up for the server, and need to enable channels before users can use commands. Please check out ``{svrDB.Prefix}help`` or ``pr.help`` to learn more about commands and configuring this bot! :)\nAdmins can use commands anywhere as long as they have the ManageChannel permission.");
+      try {
+        await newServer.SystemChannel.SendMessageAsync("", false, embed.Build());
+      } catch {
+        return;
+      }
     }
 
     //Runs when the bot leaves a server.
