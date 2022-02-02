@@ -159,22 +159,22 @@ namespace PrototonBot.Commands {
 
       // LAYER 7: Level Area
       textSettings.Width = 75;
-      textSettings.Height = 42;
-      textSettings.FontPointsize = 28;
+      textSettings.Height = 48;
+      textSettings.FontPointsize = 34;
       textSettings.TextGravity = Gravity.Southwest;
-      canvas.Composite(new MagickImage($"caption:Level", textSettings), 41, 293, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Level", textSettings), 46, 293, CompositeOperator.Over);
 
       textSettings.Width = 88;
       textSettings.Height = 60;
       textSettings.FontPointsize = 56;
       textSettings.TextGravity = Gravity.Southeast;
-      canvas.Composite(new MagickImage($"caption:{user.Level}", textSettings), 117, 283, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:{user.Level}", textSettings), 112, 283, CompositeOperator.Over);
 
       // LAYER 8: Experience Area
       textSettings.Width = 267;
       textSettings.Height = 24;
       textSettings.FontPointsize = 20;
-      canvas.Composite(new MagickImage($"caption:Next in {(long) expToNext} exp", textSettings), 694, 314, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:{(long) expToNext} exp to next", textSettings), 694, 314, CompositeOperator.Over);
 
       // Adjust text for left side entries.
       textSettings.TextGravity = Gravity.West;
@@ -184,17 +184,17 @@ namespace PrototonBot.Commands {
 
       // EDIT THE POSITION OF LEFT SIDE ENTRIES >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
       // LAYER 9: Left Side Entries
-      canvas.Composite(new MagickImage($"caption:Dogbucks: {user.Money}", textSettings), 80, 375, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:Pats: {user.PatsReceived}", textSettings), 80, 424, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:Purchases: {user.Purchases}", textSettings), 80, 473, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:Stats:", textSettings), 80, 522, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:Luck: {user.Luck}", textSettings), 100, 557, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:Daily Bonus: {user.DailyBonus}", textSettings), 100, 587, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:Mutual: {(user.Mutuals ? "Yes! ( +5% $/XP )" : "No!" )}", textSettings), 80, 669, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Dogbucks: {user.Money}", textSettings), 85, 375, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Pats: {user.PatsReceived}", textSettings), 85, 424, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Purchases: {user.Purchases}", textSettings), 85, 473, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Stats:", textSettings), 85, 522, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Luck: {user.Luck}", textSettings), 105, 557, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Daily Bonus: {user.DailyBonus}", textSettings), 105, 587, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Mutual: {(user.Mutuals ? "Yes! ( +5% $/XP )" : "No!" )}", textSettings), 85, 669, CompositeOperator.Over);
 
       var userPartner = MongoHelper.GetUser(user.Partner).Result;
       textSettings.FontPointsize = (userPartner == null) ? 36 : (userPartner.Name.Length < 12 ? 36 : 26);
-      canvas.Composite(new MagickImage($"caption:Partner: {(userPartner != null ? userPartner.Name : "Nobody!")}", textSettings), 80, 629, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Partner: {(userPartner != null ? userPartner.Name : "Nobody!")}", textSettings), 85, 629, CompositeOperator.Over);
 
       // Adjust text for right side entries.
       textSettings.TextGravity = Gravity.East;
