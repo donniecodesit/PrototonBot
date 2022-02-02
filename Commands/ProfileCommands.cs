@@ -74,13 +74,10 @@ namespace PrototonBot.Commands {
     };
 
     // We also do not need to load most of these composing images every time, so they are declared here. Make sure you .Clone() before use!
-    private static MagickImage ProfileBackground = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "background.png"), ImageReadSettings);
-    private static MagickImage ProfileBackgroundHole = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "background_hole.png"), ImageReadSettings);
-    private static MagickImage ProfileMask = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "profile_mask.png"), ImageReadSettings);
-    private static MagickImage DeveloperOverlay = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "developer_overlay.png"), ImageReadSettings);
-    private static MagickImage NormalOverlay = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "normal_overlay.png"), ImageReadSettings);
-    private static MagickImage ExperienceBar = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "experience_bar.png"), ImageReadSettings);
-    private static MagickImage ExperienceBarOutline = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "experience_bar_outline.png"), ImageReadSettings);
+    private static MagickImage ProfileBackground = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "BACKGROUND.png"), ImageReadSettings);
+    private static MagickImage DeveloperBox = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "DEVBOX.png"), ImageReadSettings);
+    private static MagickImage NormalBoxes = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "BOXES.png"), ImageReadSettings);
+    private static MagickImage ExperienceBar = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "EXPBAR.png"), ImageReadSettings);
 
     [Command("profile")] [Alias("currency", "bank", "account", "me", "money")]
     public async Task ProfileNew(string userCalled = null) {
@@ -89,6 +86,7 @@ namespace PrototonBot.Commands {
       Directory.CreateDirectory(Program.CacheDir);
       var webClient = new WebClient();
 
+      // Pull information about the author, or the user tagged.
       if (userCalled == null) {
         user = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
         inv = MongoHelper.GetInventory(Context.User.Id.ToString()).Result;
@@ -117,110 +115,110 @@ namespace PrototonBot.Commands {
         TextInterwordSpacing = 8D
       };
 
-      // Profile photo is the only user-specific variable we use. Delete the old one, and get fresh ones.
+      // Fetch the user's profile photo.
       var discordUser = Context.Client.GetUserAsync(Convert.ToUInt64(user.Id)).Result;
       webClient.DownloadFile($"https://cdn.discordapp.com/avatars/{discordUser.Id}/{discordUser.AvatarId}.png?size=512", Path.Combine(Program.CacheDir, $"{user.Id}.png"));
       var userPhoto = new MagickImage(Path.Combine(Program.CacheDir, $"{user.Id}.png"), ImageReadSettings);
+      userPhoto.Resize(185, 185);
 
-      // Our canvas starts with a clone of the basic background.
+      // LAYER 1: Background
       var canvas = ProfileBackground.Clone();
-      // We modify the text settings, so we copy our defaults before modifications.
 
-      userPhoto.Resize(317, 317);
-      userPhoto.Composite(ProfileMask, Channels.Alpha);
-
-      // Composite the user's icon onto the canvas.
-      canvas.Composite(userPhoto, 16, 16, CompositeOperator.Over);
-
-      // Composite the background over the current canvas to temporarily fix lower-right PFP masking failure.
-      canvas.Composite(ProfileBackgroundHole, 0, 0, CompositeOperator.Over);
-
-      // Composite the appropriate overlay.
-      canvas.Composite(UtilityHelper.IsUserDeveloper(user.Id) ? DeveloperOverlay : NormalOverlay, CompositeOperator.Over);
-
-      // Composite the user's name and discriminator.
-      canvas.Composite(new MagickImage($"caption:{discordUser.Username}#{discordUser.Discriminator}", textSettings), 341, 19, CompositeOperator.Over);
-
-      // Calculate experience stuff.
+      // Calculate User Experience for the bar
       var expForCurrent = (user.Level == 0) ? 0 : ((20d * user.Level) * ((31d * user.Level) - 17d)) / 3d;
       var expForNext = ((20d * (user.Level + 1d)) * ((31d * (user.Level + 1d)) - 17d)) / 3d;
       var expToNext = expForNext - user.EXP;
       var expOffset = user.EXP - expForCurrent;
       var expPercent = expOffset / (expForNext - expForCurrent);
-      //It will not crop to 0, so I'll crop it to the smallest possible.
-      if(expPercent == 0) expPercent = 0.01;
+      if (expPercent == 0) expPercent = 0.01;
 
-      // Clone, crop, and composite the experience bar on.
+      // LAYER 2: Experience Bar
       var userExperience = ExperienceBar.Clone();
       userExperience.Crop((int) (ExperienceBar.Width * expPercent), ExperienceBar.Height);
-      canvas.Composite(userExperience, 234, 286, CompositeOperator.Over);
+      canvas.Composite(userExperience, 217, 292, CompositeOperator.Over);
 
-      // Write text for the experience bars.
-      textSettings.Width = 159;
-      textSettings.Height = 43;
-      canvas.Composite(new MagickImage($"caption:Level: {user.Level}", textSettings), 275, 287, CompositeOperator.Over);
-      textSettings.Width = 199;
-      textSettings.Height = 27;
-      textSettings.TextGravity = Gravity.East;
-      canvas.Composite(new MagickImage($"caption:To Level {user.Level + 1}: {(int) expToNext}xp", textSettings), 727, 304, CompositeOperator.Over);
+      // LAYER 3: User Icon
+      canvas.Composite(userPhoto, 52, 40, CompositeOperator.Over);
 
-      // Composite the experience bar overlay.
-      canvas.Composite(ExperienceBarOutline, CompositeOperator.Over);
+      // LAYER 4: Developer Box if user is developer
+      if (UtilityHelper.IsUserDeveloper(user.Id)) canvas.Composite(DeveloperBox, CompositeOperator.Over);
 
-      // Adjust text size based on description length.
-      if (user.Description.Length >= 0 && user.Description.Length < 121) textSettings.FontPointsize = 36;
-      else textSettings.FontPointsize = 18;
+      // LAYER 5: Container Boxes
+      canvas.Composite(NormalBoxes, CompositeOperator.Over);
+
+      // LAYER 6: Username and Description
+      textSettings.Width = 680;
+      textSettings.Height = 96;
       textSettings.TextGravity = Gravity.Center;
-      textSettings.Width = 655;
-      textSettings.Height = 154;
+      textSettings.FontPointsize = (user.Description.Length < 121) ? 32 : 16;
+      canvas.Composite(new MagickImage($"caption:{user.Description}", textSettings), 275, 115, CompositeOperator.Over);
 
-      // Composite description text onto the profile.
-      canvas.Composite(new MagickImage($"caption:{user.Description}", textSettings), 317, 111, CompositeOperator.Over);
+      textSettings.Height = 47;
+      textSettings.FontPointsize = (user.Name.Length < 12) ? 40 : 30;
+      canvas.Composite(new MagickImage($"caption:{discordUser.Username}#{discordUser.Discriminator}", textSettings), 275, 55, CompositeOperator.Over);
+
+      // LAYER 7: Level Area
+      textSettings.Width = 75;
+      textSettings.Height = 42;
+      textSettings.FontPointsize = 28;
+      textSettings.TextGravity = Gravity.Southwest;
+      canvas.Composite(new MagickImage($"caption:Level", textSettings), 41, 293, CompositeOperator.Over);
+
+      textSettings.Width = 88;
+      textSettings.Height = 60;
+      textSettings.FontPointsize = 56;
+      textSettings.TextGravity = Gravity.Southeast;
+      canvas.Composite(new MagickImage($"caption:{user.Level}", textSettings), 117, 283, CompositeOperator.Over);
+
+      // LAYER 8: Experience Area
+      textSettings.Width = 267;
+      textSettings.Height = 24;
+      textSettings.FontPointsize = 20;
+      canvas.Composite(new MagickImage($"caption:Next in {(long) expToNext} exp", textSettings), 694, 314, CompositeOperator.Over);
 
       // Adjust text for left side entries.
       textSettings.TextGravity = Gravity.West;
-      textSettings.Width = 477;
-      textSettings.Height = 39;
+      textSettings.Width = 420;
+      textSettings.Height = 40;
+      textSettings.FontPointsize = 36;
 
-      // Composite text for left side entries.
-      canvas.Composite(new MagickImage($"caption:{user.Money}", textSettings), 99, 389, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:{user.PatsReceived}", textSettings), 99, 483, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:{user.Purchases}", textSettings), 99, 572, CompositeOperator.Over);
+      // EDIT THE POSITION OF LEFT SIDE ENTRIES >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      // LAYER 9: Left Side Entries
+      canvas.Composite(new MagickImage($"caption:Dogbucks: {user.Money}", textSettings), 80, 375, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Pats: {user.PatsReceived}", textSettings), 80, 424, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Purchases: {user.Purchases}", textSettings), 80, 473, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Stats:", textSettings), 80, 522, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Luck: {user.Luck}", textSettings), 100, 557, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Daily Bonus: {user.DailyBonus}", textSettings), 100, 587, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Mutual: {(user.Mutuals ? "Yes! ( +5% $/XP )" : "No!" )}", textSettings), 80, 669, CompositeOperator.Over);
 
-      // Check if user has a partner, and composite the appropriate text.
-      canvas.Composite(user.Partner != "None"
-          ? new MagickImage($"caption:{MongoHelper.GetUser(user.Partner).Result.Name}", textSettings)
-          : new MagickImage($"caption:Nobody!", textSettings)
-          , 99, 660, CompositeOperator.Over);
-
-      // Check if user has a mutual, and composite the appropriate text.
-      canvas.Composite(user.Mutuals
-          ? new MagickImage($"caption:Yes! (+5% $+XP)", textSettings)
-          : new MagickImage($"caption:No!", textSettings)
-          , 99, 751, CompositeOperator.Over);
-
-      // Continue left side entries.
-      canvas.Composite(new MagickImage($"caption:Luck: {user.Luck}", textSettings), 99, 848, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:DailyBonus: {user.DailyBonus}", textSettings), 99, 891, CompositeOperator.Over);
+      var userPartner = MongoHelper.GetUser(user.Partner).Result;
+      textSettings.FontPointsize = (userPartner == null) ? 36 : (userPartner.Name.Length < 12 ? 36 : 26);
+      canvas.Composite(new MagickImage($"caption:Partner: {(userPartner != null ? userPartner.Name : "Nobody!")}", textSettings), 80, 629, CompositeOperator.Over);
 
       // Adjust text for right side entries.
-      textSettings.TextGravity = Gravity.Northeast;
+      textSettings.TextGravity = Gravity.East;
 
-      // Composite text for right side entries.
-      canvas.Composite(new MagickImage($"caption:Times: {user.Gambles}", textSettings), 426, 389, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:Wins: {user.GamblesWon} ({user.GamblesNetGain})", textSettings), 426, 437, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:Losses: {user.GamblesLost} ({user.GamblesNetLoss})", textSettings), 426, 485, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:DC: {inv.DailyCoins} / {inv.DailyCoinsTotal}", textSettings), 426, 572, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:PC: {inv.PatCoins} / {inv.PatCoinsTotal}", textSettings), 426, 620, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:GC: {inv.GambleCoins} / {inv.GambleCoinsTotal}", textSettings), 426, 668, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:HC: {inv.HugCoins} / {inv.HugCoinsTotal}", textSettings), 426, 716, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:Received: {user.TransferIn}", textSettings), 426, 797, CompositeOperator.Over);
-      canvas.Composite(new MagickImage($"caption:Sent: {user.TransferOut}", textSettings), 426, 845, CompositeOperator.Over);
+      //LAYER 10: Right Side Entries
+      canvas.Composite(new MagickImage($"caption:Gambles, Coins, Other", textSettings), 500, 375, CompositeOperator.Over);
 
-      canvas.Composite(user.Boosted
-          ? new MagickImage($"caption:Boosted: Yes! (+5% $+XP)", textSettings)
-          : new MagickImage($"caption:Boosted: No!", textSettings)
-          , 426, 893, CompositeOperator.Over);
+      textSettings.Width = 420;
+      textSettings.Height = 30;
+      textSettings.FontPointsize = 26;
+
+      canvas.Composite(new MagickImage($"caption:Times: {user.Gambles}", textSettings), 500, 410, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Wins: {user.GamblesWon} ({user.GamblesNetGain})", textSettings), 500, 435, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Losses: {user.GamblesLost} ({user.GamblesNetLoss})", textSettings), 500, 460, CompositeOperator.Over);
+
+      canvas.Composite(new MagickImage($"caption:DC: {inv.DailyCoins} ({inv.DailyCoinsTotal})", textSettings), 500, 500, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:PC: {inv.PatCoins} ({inv.PatCoinsTotal})", textSettings), 500, 525, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:GC: {inv.GambleCoins} ({inv.GambleCoinsTotal})", textSettings), 500, 550, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:HC: {inv.HugCoins} ({inv.HugCoinsTotal})", textSettings), 500, 575, CompositeOperator.Over);
+
+      canvas.Composite(new MagickImage($"caption:Received: {user.TransferIn}", textSettings), 500, 615, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Sent: {user.TransferOut}", textSettings), 500, 645, CompositeOperator.Over);
+
+      canvas.Composite(new MagickImage($"caption:Mutual: {(user.Boosted ? "Yes! ( +5% $/XP )" : "No!" )}", textSettings), 500, 675, CompositeOperator.Over);
 
       canvas.Write(Path.Combine(Program.CacheDir, $"{user.Id}_out.png"));
       await Context.Channel.SendFileAsync(Path.Combine(Program.CacheDir, $"{user.Id}_out.png"));
