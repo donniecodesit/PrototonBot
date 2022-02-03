@@ -43,6 +43,7 @@ namespace PrototonBot {
     private async Task OnReady() {
       await client.SetStatusAsync(UserStatus.Online);
       await client.SetGameAsync("pr.help", null, ActivityType.Listening);
+      Program.LastRestartTime = DateTime.Now.ToString("MMMM dd yyyy h:mm tt");
 
       //If you're using TOP.GG, this will update the bot page's server count.
       if (Program.EnableBotList) {

@@ -58,9 +58,9 @@ namespace PrototonBot.Commands
       embed.AddField("Created By", "Donovan Laws", true);
       embed.AddField("Default Prefix", $"Global: pr.\nHere: {serverObj.Prefix}", true);
       embed.AddField("Servers", $"\nServers: {Context.Client.Guilds.Count}", true);
-      embed.AddField("Features", "**TBA**", true);
       if (gitValid) embed.AddField("Git Repo", $"[Git Repo Page]({repo})", true);
       embed.AddField("Invite Bot", $"[Invite Link](https://discord.com/oauth2/authorize?client_id={Program.UserID}&permissions=8&scope=bot)", true);
+      embed.AddField("Last Restart", $"{Program.LastRestartTime} {Program.TimeZone}", true);
       embed.WithFooter($"{((gitValid) ? "You can report bugs/issues to the GitHub Page's Issues Tab" : "")}\nBuilt with Visual Studio Code and Discord.Net");
       await Context.Channel.SendMessageAsync("", false, embed.Build());
     }

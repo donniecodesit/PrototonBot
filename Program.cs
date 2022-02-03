@@ -20,6 +20,8 @@ namespace PrototonBot {
     public static string CacheDir;
     public static string MasterSvr;
     public static string GitHubRepoURL;
+    public static string LastRestartTime;
+    public static string TimeZone = "UTC";
 
 
     static void Main(string[] args) {

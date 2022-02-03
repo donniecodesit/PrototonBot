@@ -112,7 +112,7 @@ namespace PrototonBot.Commands {
 
     [Command("bottime")]
     public async Task BotTime() {
-      await Context.Channel.SendMessageAsync($"{DateTime.Now.ToString("MMMM dd yyyy h:mm tt")}");
+      await Context.Channel.SendMessageAsync($"The bot's current time is: {DateTime.Now.ToString("MMMM dd yyyy h:mm tt")}");
     }
   }
 }
