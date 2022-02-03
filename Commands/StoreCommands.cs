@@ -30,8 +30,9 @@ namespace PrototonBot.Commands {
         embed.WithTitle("PrototonBot Store - Page 1");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithFooter($"Replying to: {Context.User.Username}");
-        embed.AddField($"``{serverObj.Prefix}buy Boosted`` - 10,000 Protobucks", "Get a 5% multiplier on Chat EXP and Protobucks!");
-        embed.AddField($"``{serverObj.Prefix}buy DailyPat`` - 1,000 Protobucks", "Restore your daily pat so that you can give another one!");
+        embed.AddField($"``{serverObj.Prefix}buy Boosted`` - 30,000 Protobucks", "Get a 5% multiplier on Chat EXP and Protobucks!");
+        embed.AddField($"``{serverObj.Prefix}buy ProfileTheme`` - 10,000 Dogbucks", $"Purchase a profile theme that you can keep and swap! More info with `{serverObj.Prefix}help themes`");
+        embed.AddField($"``{serverObj.Prefix}buy DailyPat`` - 3,000 Protobucks", "Restore your daily pat so that you can give another one!");
         embed.AddField("Your Protobucks", user.Money);
         await Context.Channel.SendMessageAsync("", false, embed.Build());
         return;
@@ -42,9 +43,9 @@ namespace PrototonBot.Commands {
         embed.WithTitle("PrototonBot Store - Page 2");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithFooter($"Replying to: {Context.User.Username}");
-        embed.AddField($":axe: ``{serverObj.Prefix}buy axe`` - 500 Protobucks", $"Allows you to use ``{serverObj.Prefix}chopdown``!");
-        embed.AddField($":pick: ``{serverObj.Prefix}buy pick`` - 700 Protobucks", $"Allows you to use ``{serverObj.Prefix}mine``!");
-        embed.AddField($":wrench: ``{serverObj.Prefix}buy wrench`` - 900 Protobucks", $"Allows you to use ``{serverObj.Prefix}salvage``!");
+        embed.AddField($":axe: ``{serverObj.Prefix}buy axe`` - 1000 Protobucks", $"Allows you to use ``{serverObj.Prefix}chopdown``!");
+        embed.AddField($":pick: ``{serverObj.Prefix}buy pick`` - 1250 Protobucks", $"Allows you to use ``{serverObj.Prefix}mine``!");
+        embed.AddField($":wrench: ``{serverObj.Prefix}buy wrench`` - 1500 Protobucks", $"Allows you to use ``{serverObj.Prefix}salvage``!");
         embed.AddField("Your Protobucks", user.Money);
         await Context.Channel.SendMessageAsync("", false, embed.Build());
         return;
@@ -52,86 +53,135 @@ namespace PrototonBot.Commands {
     }
 
     [Command("buy")] [Alias("purchase", "redeem", "get")]
-    public async Task BuyCommand(string item = null) {
+    public async Task BuyCommand(string item = null, string arg = null) {
       var serverObj = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
       var user = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
       var inv = MongoHelper.GetInventory(Context.User.Id.ToString()).Result;
 
       if (item == null) {
-        await Context.Channel.SendMessageAsync($"Please enter a valid item to buy.\nUse {serverObj.Prefix}store to learn more.");
+        await Context.Channel.SendMessageAsync($"Please enter a valid item to buy. Use {serverObj.Prefix}store to learn more.");
         return;
-      } 
-
-      if (item.ToLower() == "boosted") {
-        if (user.Money >= 10000) {
-          if (user.Boosted == true) await Context.Channel.SendMessageAsync($"You already are boosted, <@{user.Id}>!");
-          else {
-            await Context.Channel.SendMessageAsync($"Congratulations! You're now boosted and had 10000 Protobucks taken from your bank. Enjoy! <@{user.Id}>");
-            await MongoHelper.UpdateUser(user.Id, "Money", (user.Money - 10000));
-            await MongoHelper.UpdateUser(user.Id, "Purchases", (user.Purchases + 1));
-            await MongoHelper.UpdateUser(user.Id, "Boosted", true);
-          }
-        } else {
-          await Context.Channel.SendMessageAsync($"Sorry, but you don't have enough Protobucks to afford this!\nYou have {user.Money}/10000 Protobucks.");
-        }
       }
 
-      else if (item.ToLower() == "dailypat") {
-        if (user.Money >= 1000) {
-          var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-          if (user.LastPat > (currentTime - 86400)) {
-            await MongoHelper.UpdateUser(user.Id, "LastPat", 0);
+      switch (item.ToLower()) {
+        case "boosted": {
+          if (user.Money >= 30000) {
+            if (user.Boosted == true) await Context.Channel.SendMessageAsync($"You already are boosted, <@{user.Id}>!");
+            else {
+              await Context.Channel.SendMessageAsync($"Congratulations! You're now boosted and had 30000 Protobucks taken from your bank. Enjoy! <@{user.Id}>");
+              await MongoHelper.UpdateUser(user.Id, "Money", (user.Money - 30000));
+              await MongoHelper.UpdateUser(user.Id, "Purchases", (user.Purchases + 1));
+              await MongoHelper.UpdateUser(user.Id, "Boosted", true);
+            }
+          } 
+          else await Context.Channel.SendMessageAsync($"Sorry, but you don't have enough Protobucks to afford this!\nYou have {user.Money}/30000 Protobucks.");
+          break;
+        }
+        case "dailypat": {
+          if (user.Money >= 3000) {
+            var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            if (user.LastPat > (currentTime - 86400)) {
+              await MongoHelper.UpdateUser(user.Id, "LastPat", 0);
+              await MongoHelper.UpdateUser(user.Id, "Money", (user.Money - 3000));
+              await MongoHelper.UpdateUser(user.Id, "Purchases", (user.Purchases + 1));
+              await Context.Channel.SendMessageAsync($"Awesome! Your daily pat was reset and 3000 Protobucks taken from your bank. Enjoy, <@{user.Id}>!");
+            } else {
+              await Context.Channel.SendMessageAsync($"You haven't even given away your daily pat today, wouldn't that be a waste of Protobucks, <@{user.Id}>?");
+            }
+          } 
+          else await Context.Channel.SendMessageAsync($"Sorry, but you don't have enough Protobucks to afford this!\nYou have {user.Money}/3000 Protobucks.");
+          break;
+        }
+        case "axe": {
+          if (user.Money >= 1000) {
+            await MongoHelper.UpdateInventory(user.Id, "Axes", (inv.Axes + 1));
+            if (inv.AxeUses == 0) await MongoHelper.UpdateInventory(user.Id, "AxeUses", 10);
             await MongoHelper.UpdateUser(user.Id, "Money", (user.Money - 1000));
             await MongoHelper.UpdateUser(user.Id, "Purchases", (user.Purchases + 1));
-            await Context.Channel.SendMessageAsync($"Awesome! Your daily pat was reset and 1000 Protobucks taken from your bank. Enjoy, <@{user.Id}>!");
-          } else {
-            await Context.Channel.SendMessageAsync($"You haven't even given away your daily pat today, wouldn't that be a waste of Protobucks, <@{user.Id}>?");
+            await Context.Channel.SendMessageAsync($"Awesome, you've purchased an :axe: for 1000 Protobucks! You now have {inv.Axes + 1} Axe{((inv.Axes + 1 == 1) ? "" : "s")}! <@{user.Id}>");
+          } 
+          else await Context.Channel.SendMessageAsync($"Sorry, but you don't have enough Protobucks to afford this!\nYou have {user.Money}/1000 Protobucks.");
+          break;
+        }
+        case "pick": {
+          if (user.Money >= 1250) {
+            await MongoHelper.UpdateInventory(user.Id, "Picks", (inv.Picks + 1));
+            if (inv.PickUses == 0) await MongoHelper.UpdateInventory(user.Id, "PickUses", 10);
+            await MongoHelper.UpdateUser(user.Id, "Money", (user.Money - 1250));
+            await MongoHelper.UpdateUser(user.Id, "Purchases", (user.Purchases + 1));
+            await Context.Channel.SendMessageAsync($"Awesome, you've purchased a :pick: for 1250 Protobucks! You now have {inv.Picks + 1} Pick{((inv.Picks + 1 == 1) ? "" : "s")}! <@{user.Id}>");
+          } 
+          else await Context.Channel.SendMessageAsync($"Sorry, but you don't have enough Protobucks to afford this!\nYou have {user.Money}/1250 Protobucks.");
+          break;
+        }
+        case "wrench": {
+          if (user.Money >= 1500) {
+            await MongoHelper.UpdateInventory(user.Id, "Wrenches", (inv.Wrenches + 1));
+            if (inv.WrenchUses == 0) await MongoHelper.UpdateInventory(user.Id, "WrenchUses", 10);
+            await MongoHelper.UpdateUser(user.Id, "Money", (user.Money - 1500));
+            await MongoHelper.UpdateUser(user.Id, "Purchases", (user.Purchases + 1));
+            await Context.Channel.SendMessageAsync($"Awesome, you've purchased a :wrench: for 1500 Protobucks! You now have {inv.Wrenches + 1} Wrench{((inv.Wrenches + 1 == 1) ? "" : "es")}! <@{user.Id}>");
+          } 
+          else await Context.Channel.SendMessageAsync($"Sorry, but you don't have enough Protobucks to afford this!\nYou have {user.Money}/1500 Protobucks.");
+          break;
+        }
+        case "profiletheme": {
+          if (arg == null) {
+            await Context.Channel.SendMessageAsync($"Please specify what profile theme you'd like to purchase!\nAvailable: *Red, Yellow, Green, Blue, Pink, and Black*\nYou own: *{String.Join(", ", inv.OwnedThemes)}, and default/purple.*");
+            return;
           }
-        } else {
-          await Context.Channel.SendMessageAsync($"Sorry, but you don't have enough Protobucks to afford this!\nYou have {user.Money}/1000 Protobucks.");
+          if (user.Money >= 10000) {
+            var ownedThemes = inv.OwnedThemes;
+            if (ownedThemes.Contains(arg.ToLower())) {
+              await Context.Channel.SendMessageAsync("You already own this theme!");
+              return;
+            }
+            
+            switch (arg.ToLower()) {
+              case "red": {
+                ownedThemes.Add("red");
+                break;
+              }
+              case "yellow": {
+                ownedThemes.Add("yellow");
+                break;
+              }
+              case "green": {
+                ownedThemes.Add("green");
+                break;
+              }
+              case "blue": {
+                ownedThemes.Add("blue");
+                break;
+              }
+              case "pink": {
+                ownedThemes.Add("pink");
+                break;
+              }
+              case "black": {
+                ownedThemes.Add("black");
+                break;
+              }
+              default: {
+                await Context.Channel.SendMessageAsync("Please specify a valid theme to purchase!\nAvailable: *Red, Yellow, Green, Blue, Pink, Black*");
+                return;
+              }
+            }
+
+            await MongoHelper.UpdateInventory(user.Id, "OwnedThemes", ownedThemes);
+            await MongoHelper.UpdateUser(user.Id, "Money", (user.Money - 10000));
+            await MongoHelper.UpdateUser(user.Id, "Purchases", (user.Purchases + 1));
+            await Context.Channel.SendMessageAsync($"Awesome, you've purchased the {arg.ToLower()} for 10000 Protobucks! Go equip it using ``{serverObj.Prefix}settheme {arg.ToLower()}``");
+          }
+          else await Context.Channel.SendMessageAsync($"Sorry, but you don't have enough Protobucks to afford this!\nYou have {user.Money}/10000 Protobucks.");
+          break;
+        }
+
+        default: {
+          await Context.Channel.SendMessageAsync($"Sorry, but the item you typed doesn't exist in our store. Please check the spelling or store and try again =) <@{user.Id}>");
+          break;
         }
       }
-
-      else if (item.ToLower() == "axe") {
-        if (user.Money >= 500) {
-          await MongoHelper.UpdateInventory(user.Id, "Axes", (inv.Axes + 1));
-          if (inv.AxeUses == 0) await MongoHelper.UpdateInventory(user.Id, "AxeUses", 10);
-          await MongoHelper.UpdateUser(user.Id, "Money", (user.Money - 500));
-          await MongoHelper.UpdateUser(user.Id, "Purchases", (user.Purchases + 1));
-          await Context.Channel.SendMessageAsync($"Awesome, you've purchased an :axe: for 500 Protobucks! You now have {inv.Axes + 1} Axe{((inv.Axes + 1 == 1) ? "" : "s")}! <@{user.Id}>");
-        } else {
-          await Context.Channel.SendMessageAsync($"Sorry, but you don't have enough Protobucks to afford this!\nYou have {user.Money}/500 Protobucks.");
-        }
-      }
-
-      else if (item.ToLower() == "pick") {
-        if (user.Money >= 700) {
-          await MongoHelper.UpdateInventory(user.Id, "Picks", (inv.Picks + 1));
-          if (inv.PickUses == 0) await MongoHelper.UpdateInventory(user.Id, "PickUses", 10);
-          await MongoHelper.UpdateUser(user.Id, "Money", (user.Money - 700));
-          await MongoHelper.UpdateUser(user.Id, "Purchases", (user.Purchases + 1));
-          await Context.Channel.SendMessageAsync($"Awesome, you've purchased a :pick: for 700 Protobucks! You now have {inv.Picks + 1} Pick{((inv.Picks + 1 == 1) ? "" : "s")}! <@{user.Id}>");
-        } else {
-          await Context.Channel.SendMessageAsync($"Sorry, but you don't have enough Protobucks to afford this!\nYou have {user.Money}/700 Protobucks.");
-        }
-      }
-
-      else if (item.ToLower() == "wrench") {
-        if (user.Money >= 900) {
-          await MongoHelper.UpdateInventory(user.Id, "Wrenches", (inv.Wrenches + 1));
-          if (inv.WrenchUses == 0) await MongoHelper.UpdateInventory(user.Id, "WrenchUses", 10);
-          await MongoHelper.UpdateUser(user.Id, "Money", (user.Money - 900));
-          await MongoHelper.UpdateUser(user.Id, "Purchases", (user.Purchases + 1));
-          await Context.Channel.SendMessageAsync($"Awesome, you've purchased a :wrench: for 900 Protobucks! You now have {inv.Wrenches + 1} Wrench{((inv.Wrenches + 1 == 1) ? "" : "es")}! <@{user.Id}>");
-        } else {
-          await Context.Channel.SendMessageAsync($"Sorry, but you don't have enough Protobucks to afford this!\nYou have {user.Money}/900 Protobucks.");
-        }
-      }
-
-      else {
-        await Context.Channel.SendMessageAsync($"Sorry, but the item you typed doesn't exist in our store. Please check the spelling or store and try again ^^ <@{user.Id}>");
-      }
-
       return;
     }
 

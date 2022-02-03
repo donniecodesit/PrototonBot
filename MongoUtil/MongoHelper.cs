@@ -165,6 +165,8 @@ namespace PrototonBot.MongoUtil
       userInventory.LastChop = 0;
       userInventory.LastMine = 0;
       userInventory.LastSalvage = 0;
+      userInventory.OwnedThemes = new List<string>();
+      userInventory.PickedTheme = "";
 
       userInventoryCollection.InsertOne(userInventory);
 

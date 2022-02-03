@@ -74,10 +74,42 @@ namespace PrototonBot.Commands {
     };
 
     // We also do not need to load most of these composing images every time, so they are declared here. Make sure you .Clone() before use!
-    private static MagickImage ProfileBackground = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "BACKGROUND.png"), ImageReadSettings);
     private static MagickImage DeveloperBox = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "DEVBOX.png"), ImageReadSettings);
-    private static MagickImage NormalBoxes = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "BOXES.png"), ImageReadSettings);
-    private static MagickImage ExperienceBar = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "EXPBAR.png"), ImageReadSettings);
+
+    // Red Theme
+    private static MagickImage RedProfileBackground = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "RedTheme", "BACKGROUND.png"), ImageReadSettings);
+    private static MagickImage RedProfileBoxes = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "RedTheme", "BOXES.png"), ImageReadSettings);
+    private static MagickImage RedExperienceBar = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "RedTheme", "EXPBAR.png"), ImageReadSettings);
+
+    // Yellow Theme
+    private static MagickImage YellowProfileBackground = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "YellowTheme", "BACKGROUND.png"), ImageReadSettings);
+    private static MagickImage YellowProfileBoxes = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "YellowTheme", "BOXES.png"), ImageReadSettings);
+    private static MagickImage YellowExperienceBar = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "YellowTheme", "EXPBAR.png"), ImageReadSettings);
+
+    // Green Theme
+    private static MagickImage GreenProfileBackground = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "GreenTheme", "BACKGROUND.png"), ImageReadSettings);
+    private static MagickImage GreenProfileBoxes = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "GreenTheme", "BOXES.png"), ImageReadSettings);
+    private static MagickImage GreenExperienceBar = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "GreenTheme", "EXPBAR.png"), ImageReadSettings);
+
+    // Blue Theme
+    private static MagickImage BlueProfileBackground = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "BlueTheme", "BACKGROUND.png"), ImageReadSettings);
+    private static MagickImage BlueProfileBoxes = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "BlueTheme", "BOXES.png"), ImageReadSettings);
+    private static MagickImage BlueExperienceBar = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "BlueTheme", "EXPBAR.png"), ImageReadSettings);
+
+    // Default/Purple Theme
+    private static MagickImage DefaultProfileBackground = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "PurpleTheme", "BACKGROUND.png"), ImageReadSettings);
+    private static MagickImage DefaultProfileBoxes = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "PurpleTheme", "BOXES.png"), ImageReadSettings);
+    private static MagickImage DefaultExperienceBar = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "PurpleTheme", "EXPBAR.png"), ImageReadSettings);
+
+    // Pink Theme
+    private static MagickImage PinkProfileBackground = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "PinkTheme", "BACKGROUND.png"), ImageReadSettings);
+    private static MagickImage PinkProfileBoxes = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "PinkTheme", "BOXES.png"), ImageReadSettings);
+    private static MagickImage PinkExperienceBar = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "PinkTheme", "EXPBAR.png"), ImageReadSettings);
+    
+    // Black Theme
+    private static MagickImage BlackProfileBackground = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "BlackTheme", "BACKGROUND.png"), ImageReadSettings);
+    private static MagickImage BlackProfileBoxes = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "BlackTheme", "BOXES.png"), ImageReadSettings);
+    private static MagickImage BlackExperienceBar = new MagickImage(Path.Combine("Storage", "ProfileImageAssets", "BlackTheme", "EXPBAR.png"), ImageReadSettings);
 
     [Command("profile")] [Alias("currency", "bank", "account", "me", "money")]
     public async Task ProfileNew(string userCalled = null) {
@@ -122,7 +154,15 @@ namespace PrototonBot.Commands {
       userPhoto.Resize(185, 185);
 
       // LAYER 1: Background
-      var canvas = ProfileBackground.Clone();
+      var canvas = inv.PickedTheme switch {
+        "red" => RedProfileBackground.Clone(),
+        "yellow" => YellowProfileBackground.Clone(),
+        "green" => GreenProfileBackground.Clone(),
+        "blue" => BlueProfileBackground.Clone(),
+        "pink" => PinkProfileBackground.Clone(),
+        "black" => BlackProfileBackground.Clone(),
+        _ => DefaultProfileBackground.Clone()
+      };
 
       // Calculate User Experience for the bar
       var expForCurrent = (user.Level == 0) ? 0 : ((20d * user.Level) * ((31d * user.Level) - 17d)) / 3d;
@@ -133,9 +173,17 @@ namespace PrototonBot.Commands {
       if (expPercent == 0) expPercent = 0.01;
 
       // LAYER 2: Experience Bar
-      var userExperience = ExperienceBar.Clone();
-      userExperience.Crop((int) (ExperienceBar.Width * expPercent), ExperienceBar.Height);
-      canvas.Composite(userExperience, 217, 292, CompositeOperator.Over);
+      var experienceBar = inv.PickedTheme switch {
+        "red" => RedExperienceBar.Clone(),
+        "yellow" => YellowExperienceBar.Clone(),
+        "green" => GreenExperienceBar.Clone(),
+        "blue" => BlueExperienceBar.Clone(),
+        "pink" => PinkExperienceBar.Clone(),
+        "black" => BlackExperienceBar.Clone(),
+        _ => DefaultExperienceBar.Clone()
+      };
+      experienceBar.Crop((int) (experienceBar.Width * expPercent), experienceBar.Height);
+      canvas.Composite(experienceBar, 217, 292, CompositeOperator.Over);
 
       // LAYER 3: User Icon
       canvas.Composite(userPhoto, 52, 40, CompositeOperator.Over);
@@ -144,7 +192,16 @@ namespace PrototonBot.Commands {
       if (UtilityHelper.IsUserDeveloper(user.Id)) canvas.Composite(DeveloperBox, CompositeOperator.Over);
 
       // LAYER 5: Container Boxes
-      canvas.Composite(NormalBoxes, CompositeOperator.Over);
+      var boxesOverlay = inv.PickedTheme switch {
+        "red" => RedProfileBoxes.Clone(),
+        "yellow" => YellowProfileBoxes.Clone(),
+        "green" => GreenProfileBoxes.Clone(),
+        "blue" => BlueProfileBoxes.Clone(),
+        "pink" => PinkProfileBoxes.Clone(),
+        "black" => BlackProfileBoxes.Clone(),
+        _ => DefaultProfileBoxes.Clone()
+      };
+      canvas.Composite(boxesOverlay, CompositeOperator.Over);
 
       // LAYER 6: Username and Description
       textSettings.Width = 680;
@@ -222,6 +279,60 @@ namespace PrototonBot.Commands {
 
       canvas.Write(Path.Combine(Program.CacheDir, $"{user.Id}_out.png"));
       await Context.Channel.SendFileAsync(Path.Combine(Program.CacheDir, $"{user.Id}_out.png"));
+    }
+
+    [Command("settheme")] [Alias("changetheme", "theme")]
+    public async Task SetProfileTheme(string theme = null) {
+      UserObject user = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
+      InventoryObject inv = MongoHelper.GetInventory(Context.User.Id.ToString()).Result;
+      var webClient = new WebClient();
+
+      if (theme == null) {
+        await Context.Channel.SendMessageAsync($"Please specify the theme you want to set!\nYou own: *{String.Join(", ", inv.OwnedThemes)}, and default/purple.*");
+        return;
+      }
+      if (!inv.OwnedThemes.Contains(theme.ToLower()) && theme.ToLower() != "default" && theme.ToLower() != "purple") {
+        await Context.Channel.SendMessageAsync($"Sorry, but you don't own the {theme.ToLower()} theme!");
+        return;
+      }
+
+      switch (theme.ToLower()) {
+        case "red": {
+          await MongoHelper.UpdateInventory(user.Id, "PickedTheme", "red");
+          break;
+        }
+        case "yellow": {
+          await MongoHelper.UpdateInventory(user.Id, "PickedTheme", "yellow");
+          break;
+        }
+        case "green": {
+          await MongoHelper.UpdateInventory(user.Id, "PickedTheme", "green");
+          break;
+        }
+        case "blue": {
+          await MongoHelper.UpdateInventory(user.Id, "PickedTheme", "blue");
+          break;
+        }
+        case "purple":
+        case "default": {
+          await MongoHelper.UpdateInventory(user.Id, "PickedTheme", "default");
+          break;
+        }
+        case "pink": {
+          await MongoHelper.UpdateInventory(user.Id, "PickedTheme", "pink");
+          break;
+        }
+        case "black": {
+          await MongoHelper.UpdateInventory(user.Id, "PickedTheme", "black");
+          break;
+        }
+        default: {
+          await Context.Channel.SendMessageAsync($"Please specify the theme you want to set!\nYou own: *{String.Join(", ", inv.OwnedThemes)}, and default/purple.*");
+          return;
+        }
+      }
+
+      await Context.Channel.SendMessageAsync($"Sounds good, your profile theme is now set to {theme.ToLower()}!");
     }
 
     [Command("bag")] [Alias("inventory", "bags", "items")]

@@ -7,6 +7,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using DnsClient.Protocol;
 using PrototonBot.MongoUtil;
+using System.IO;
 
 namespace PrototonBot.Commands
 {
@@ -135,6 +136,19 @@ namespace PrototonBot.Commands
         embed.AddField("**Scenario  Commands**", "`8ball` `mood` `roll` `murdering` `murdering-rp` `murdering-all`");
         embed.AddField("**Admin  Commands**", "`enable` `disable` `logchannel` `prefix` `privacy` `levelups` `togglewelcomes` `welcomechannel` `massrolecheck` `purge`");
         await Context.Channel.SendMessageAsync("", false, embed.Build());
+      }
+
+      [Command("themes")]
+      public async Task ThemesTip() {
+        var embed = new EmbedBuilder();
+        var svr = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
+        embed.WithTitle("Profile Themes");
+        embed.WithColor(0xB2A2F1);
+        embed.AddField("**Buying Profile Themes**", $"Profile themes are able to be purchased from the PrototonBot store if you use this command: ``{svr.Prefix}buy ProfileTheme Red``. \nAvailable to purchase are: *Red, Yellow, Green, Blue, Pink, Black*");
+        embed.AddField("**Setting Profile Themes**", $"Once purchased, you can apply your new theme if you use this command: ``{svr.Prefix}settheme Red``\nPrototonBot profiles are Purple theme by default without purchase, so if you want a purple theme, use *Purple* or *Default*. ");
+
+        var attachment = Path.Combine("Storage", "ProfileImageAssets", "ProfileThemes.png");
+        await Context.Channel.SendFileAsync(attachment, "", false, embed.Build());
       }
     }
   }

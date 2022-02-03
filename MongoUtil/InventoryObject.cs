@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace PrototonBot.MongoUtil
 {
   public class InventoryObject
@@ -36,5 +38,7 @@ namespace PrototonBot.MongoUtil
     public int LastChop { get; set; }
     public int LastMine { get; set; }
     public int LastSalvage { get; set; }
+    public List<string> OwnedThemes { get; set; }
+    public string PickedTheme { get; set; }
   }
 }
