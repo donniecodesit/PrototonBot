@@ -267,6 +267,7 @@ namespace PrototonBot.Commands
       var inv = MongoHelper.GetInventory(Context.User.Id.ToString()).Result;
       var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
       var GambleVariant = ((rand.NextDouble() * 0.5) + 0.75);
+      var userXPMultiplier = (1 * (user.Boosted ? 1.05 : 1) * (user.Mutuals ? 1.05 : 1)); //1, 1.05, or 1.1025
 
       if (user.Level < 3) {
         await Context.Channel.SendMessageAsync($"Sorry, but gambling is only available to users Level **3** or higher, <@{user.Id}>!\nTip: Chat in servers for a while that I'm also in to get experience to get levels.");
@@ -309,6 +310,7 @@ namespace PrototonBot.Commands
           await MongoHelper.UpdateUser(user.Id, "GamblesWon", (user.GamblesWon + 1));
           await MongoHelper.UpdateUser(user.Id, "GamblesNetGain", ((user.GamblesNetGain - bet) + bet3));
           await MongoHelper.UpdateUser(user.Id, "Money", ((user.Money - bet) + bet3));
+          await MongoHelper.UpdateUser(user.Id, "EXP", (Math.Floor(user.EXP + (30 * userXPMultiplier))));
           await Context.Channel.SendMessageAsync($"Wow, you did great at the casino, <@{user.Id}>.\nYou bet {bet} Protobacks and made a profit of {bet3 - bet} Protobucks!\nYou also received 2 Gamble Coins!");
         }
         else if (gambleChance >= 13 && gambleChance <= 37) {
@@ -317,9 +319,11 @@ namespace PrototonBot.Commands
           await MongoHelper.UpdateUser(user.Id, "GamblesWon", (user.GamblesWon + 1));
           await MongoHelper.UpdateUser(user.Id, "GamblesNetGain", ((user.GamblesNetGain - bet) + bet2));
           await MongoHelper.UpdateUser(user.Id, "Money", ((user.Money - bet) + bet2));
+          await MongoHelper.UpdateUser(user.Id, "EXP", (Math.Floor(user.EXP + (20 * userXPMultiplier))));
           await Context.Channel.SendMessageAsync($"You seem to have done well at the casino, <@{user.Id}>.\nYou bet {bet} Protobucks and made a profit of {bet2 - bet} Protobucks!\nYou also received a Gamble Coin!");
         }
         else if (gambleChance >= 38 && gambleChance <= 66) {
+          await MongoHelper.UpdateUser(user.Id, "EXP", (Math.Floor(user.EXP + (10 * userXPMultiplier))));
           await Context.Channel.SendMessageAsync($"<@{user.Id}>, although you had a bit of fun at the casino, you left keeping your {bet} Protobucks.");
         }
         else if (gambleChance >= 67) {

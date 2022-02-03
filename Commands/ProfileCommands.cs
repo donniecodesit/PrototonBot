@@ -386,6 +386,7 @@ namespace PrototonBot.Commands {
       InventoryObject inv = MongoHelper.GetInventory(Context.User.Id.ToString()).Result;
       var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
       var dailySuccess = new EmbedBuilder();
+      var userXPMultiplier = (1 * (user.Boosted ? 1.05 : 1) * (user.Mutuals ? 1.05 : 1)); //1, 1.05, or 1.1025
 
       // Within last 24 hours: >(currentTime - 86400)
       // Not within last 24 hours: <(currentTime - 86400)
@@ -403,15 +404,17 @@ namespace PrototonBot.Commands {
         await Context.Channel.SendMessageAsync("", false, dailyRejected.Build());
         return;
       } 
-
+      
       // If command executed outside of 24 hours, and within 48 hours, streak.
       else if (user.LastDaily > (currentTime - 172800)) {
         if (((user.DailyStreak + 1) > 1) && ((user.DailyStreak + 1) % 7) == 0) {
           await MongoHelper.UpdateUser(user.Id, "Money", (user.Money + 2000 + user.DailyBonus));
-          dailySuccess.AddField("Daily Claimed!", $"<@{user.Id}>, you received **{500 + user.DailyBonus}** Protobucks as a daily reward, and **1500** more for completing a weekly streak!\nYou now have **{user.Money + 2000 + user.DailyBonus}** Protobucks, and received 1 Daily Coin.\nStreak: {1 + user.DailyStreak} *(Every week, get a bonus!)*");
+          await MongoHelper.UpdateUser(user.Id, "EXP", (Math.Floor(user.EXP + (300 * userXPMultiplier))));
+          dailySuccess.AddField($"Daily Claimed: {user.Name}!", $"You received **{500 + user.DailyBonus}** Protobucks, and **1500** more for completing a weekly streak!\nYou now have **{user.Money + 2000 + user.DailyBonus}** Protobucks, and received 1 Daily Coin.\nStreak: {1 + user.DailyStreak} *(Bonus every 7 days!)*");
         } else {
           await MongoHelper.UpdateUser(user.Id, "Money", (user.Money + 500 + user.DailyBonus));
-          dailySuccess.AddField("Daily Claimed!", $"<@{user.Id}>, you received **{500 + user.DailyBonus}** Protobucks as a daily reward!\nYou now have **{user.Money + 500 + user.DailyBonus}** Protobucks, and received 1 Daily Coin.\nStreak: {1 + user.DailyStreak} *(Every week, get a bonus!)*");
+          await MongoHelper.UpdateUser(user.Id, "EXP", (Math.Floor(user.EXP + (150 * userXPMultiplier))));
+          dailySuccess.AddField($"Daily Claimed: {user.Name}!", $"You received **{500 + user.DailyBonus}** Protobucks!\nYou now have **{user.Money + 500 + user.DailyBonus}** Protobucks, and received 1 Daily Coin.\nStreak: {1 + user.DailyStreak} *(Bonus every 7 days!)*");
         }
         await MongoHelper.UpdateUser(user.Id, "DailyStreak", (user.DailyStreak + 1));
       } 
@@ -419,8 +422,9 @@ namespace PrototonBot.Commands {
       // Command was executed outside of 48 hours.
       else {
         await MongoHelper.UpdateUser(user.Id, "Money", (user.Money + 500 + user.DailyBonus));
+        await MongoHelper.UpdateUser(user.Id, "EXP", (Math.Floor(user.EXP + (75 * userXPMultiplier))));
         await MongoHelper.UpdateUser(user.Id, "DailyStreak", 1);
-        dailySuccess.AddField("Daily Claimed!", $"<@{user.Id}>, you received **{500 + user.DailyBonus}** Protobucks as a daily reward{(user.DailyStreak == 0 ? "!" : $", but lost your daily streak of {user.DailyStreak}!")}\nYou now have **{user.Money + 500 + user.DailyBonus}** Protobucks, and received 1 Daily Coin.\nStreak: 1 *(Every week, get a bonus!)*");
+        dailySuccess.AddField($"Daily Claimed: {user.Name}!", $"You received **{500 + user.DailyBonus}** Protobucks{(user.DailyStreak == 0 ? "!" : $", but lost your daily streak of {user.DailyStreak}!")}\nYou now have **{user.Money + 500 + user.DailyBonus}** Protobucks, and received 1 Daily Coin.\nStreak: 1 *(Bonus every 7 days!)*");
       }
 
       await MongoHelper.UpdateUser(user.Id, "LastDaily", currentTime);
