@@ -23,10 +23,10 @@ namespace PrototonBot.Commands
         var svr = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
         embed.WithTitle("PrototonBot Command Menu");
         embed.WithColor(0xB2A2F1);
-        embed.WithDescription($"These are the categories of commands you can use with PrototonBot!\nThis server's prefix is set to: `{svr.Prefix}`\nTo view a category, type `{svr.Prefix}help CATEGORYNAME`.\n If you want a simple version of this menu, do `{svr.Prefix}commands simple`.");
+        embed.WithDescription($"These are the categories of commands you can use with PrototonBot! This server's prefix is set to: `{svr.Prefix}`\n If you want a simple version of this menu, do `{svr.Prefix}commands simple`.\n**To view a category, type** `{svr.Prefix}help CATEGORYNAME`.");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithFooter("Thank you for using PrototonBot!");
-        embed.AddField("Categories", "1. **general** - General Commands\n2. **fun** - Fun/Action Commands\n3. **profile** - Profiling Commands\n4. **economy** - Economy Commands\n5. **media** - Image & Video commands\n6. **scenario** - RNG Scenario Commands\n7. **admin** - Administrative Commands (Admins Only)", true);
+        embed.AddField("Categories", "1. **general** - General Commands\n2. **fun** - Fun/Action Commands\n3. **profile** - Profiling Commands\n4. **economy** - Economy Commands\n5. **media** - Image & Video commands\n6. **scenario** - RNG Scenario Commands\n7. **admin** - Administrative Commands (Admins Only)\n8. **themes** - Info about profile themes", true);
         await Context.Channel.SendMessageAsync("", false, embed.Build());
       }
 
@@ -65,7 +65,7 @@ namespace PrototonBot.Commands
         embed.WithDescription($"These are the Profiling Commands you can use with PrototonBot!\nThis server's prefix is set to: `{svr.Prefix}`");
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithFooter("Thank you for using PrototonBot!");
-        embed.AddField("Profiling Commands", "•**profile** (*currency*, *bank*, *account*, *me*, *money*)\nView your profile or someone else's.\n•**wallet**\nView your bank in a much simpler form.\n•**inventory** (*bag*, *bags*, *items*)\nView what items you currently own.\n•**daily**\nEarn some extra Protobucks once per day!\n•**pat** (*pet*)\nGive a user a pat once per day! (Reputation)\n•**transfer** (*send*)\nSend Protobucks to another user!\n•**setprofile** (*description*, *profiledesc*, *setdesc*)\nSets the description on your profile. (240 limit)\n•**leaderboard** (*top*)\nView the top 15 users for Protobucks or Levels.\n•**partnerup** (*setpartner*, *partner*, *marry*)\nSet a partner. Mutuals get 5% boosted Chat EXP and Protobucks.\n•**partnerdown** (*removepartner*, *unpartner*, *divorce*)\nRemove your previously set partner.", true);
+        embed.AddField("Profiling Commands", "•**profile** (*currency*, *bank*, *account*, *me*, *money*)\nView your profile or someone else's.\n•**wallet**\nView your bank in a much simpler form.\n•**inventory** (*bag*, *bags*, *items*)\nView what items you currently own.\n•**daily**\nEarn some extra Protobucks once per day!\n•**pat** (*pet*)\nGive a user a pat once per day! (Reputation)\n•**transfer** (*send*)\nSend Protobucks to another user!\n•**setprofile** (*description*, *profiledesc*, *setdesc*)\nSets the description on your profile. (240 limit)\n•**leaderboard** (*top*)\nView the top 15 users for Protobucks or Levels.\n•**partnerup** (*setpartner*, *partner*, *marry*)\nSet a partner. Mutuals get 5% boosted Chat EXP and Protobucks.\n•**partnerdown** (*removepartner*, *unpartner*, *divorce*)\nRemove your previously set partner.\n•**settheme** (*theme*, *changetheme*)\nSet your profile theme to one that you own.", true);
         await Context.Channel.SendMessageAsync("", false, embed.Build());
       }
 
@@ -138,7 +138,7 @@ namespace PrototonBot.Commands
         await Context.Channel.SendMessageAsync("", false, embed.Build());
       }
 
-      [Command("themes")]
+      [Command("themes")] [Alias("8")]
       public async Task ThemesTip() {
         var embed = new EmbedBuilder();
         var svr = MongoHelper.GetServer(Context.Guild.Id.ToString()).Result;
