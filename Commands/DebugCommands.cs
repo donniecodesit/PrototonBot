@@ -109,5 +109,10 @@ namespace PrototonBot.Commands {
       embed.AddField("Response Time", $":dart: {Math.Abs(Math.Round(difference.TotalMilliseconds, 1))}ms", true);
       await Context.Channel.SendMessageAsync("", false, embed.Build());
     }
+
+    [Command("bottime")]
+    public async Task BotTime() {
+      await Context.Channel.SendMessageAsync($"{DateTime.Now.ToString("MMMM dd yyyy h:mm tt")}");
+    }
   }
 }
