@@ -241,7 +241,7 @@ namespace PrototonBot.Commands {
 
       // EDIT THE POSITION OF LEFT SIDE ENTRIES >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
       // LAYER 9: Left Side Entries
-      canvas.Composite(new MagickImage($"caption:Dogbucks: {user.Money}", textSettings), 85, 375, CompositeOperator.Over);
+      canvas.Composite(new MagickImage($"caption:Protobucks: {user.Money}", textSettings), 85, 375, CompositeOperator.Over);
       canvas.Composite(new MagickImage($"caption:Pats: {user.PatsReceived}", textSettings), 85, 424, CompositeOperator.Over);
       canvas.Composite(new MagickImage($"caption:Purchases: {user.Purchases}", textSettings), 85, 473, CompositeOperator.Over);
       canvas.Composite(new MagickImage($"caption:Stats:", textSettings), 85, 522, CompositeOperator.Over);
@@ -385,12 +385,15 @@ namespace PrototonBot.Commands {
       UserObject user = MongoHelper.GetUser(Context.User.Id.ToString()).Result;
       InventoryObject inv = MongoHelper.GetInventory(Context.User.Id.ToString()).Result;
       var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+      var dailySuccess = new EmbedBuilder();
 
+      // Within last 24 hours: >(currentTime - 86400)
+      // Not within last 24 hours: <(currentTime - 86400)
+
+      // If command excuted within 24 hours since last daily, reject.
       if (user.LastDaily > (currentTime - 86400)) {
-        long secsRemaining = ((user.LastDaily + 86400) - currentTime);
-        var spanOfTime = TimeSpan.FromSeconds(secsRemaining);
+        var spanOfTime = TimeSpan.FromSeconds(((user.LastDaily + 86400) - currentTime));
         string str = spanOfTime.Hours + " hour(s), " + spanOfTime.Minutes + " minute(s), and " + spanOfTime.Seconds + " second(s)!";
-
 
         var dailyRejected = new EmbedBuilder();
         dailyRejected.WithColor(0xB2A2F1);
@@ -399,17 +402,31 @@ namespace PrototonBot.Commands {
 
         await Context.Channel.SendMessageAsync("", false, dailyRejected.Build());
         return;
+      } 
+
+      // If command executed outside of 24 hours, and within 48 hours, streak.
+      else if (user.LastDaily > (currentTime - 172800)) {
+        if (((user.DailyStreak + 1) > 1) && ((user.DailyStreak + 1) % 7) == 0) {
+          await MongoHelper.UpdateUser(user.Id, "Money", (user.Money + 2000 + user.DailyBonus));
+          dailySuccess.AddField("Daily Claimed!", $"<@{user.Id}>, you received **{500 + user.DailyBonus}** Protobucks as a daily reward, and **1500** more for completing a weekly streak!\nYou now have **{user.Money + 2000 + user.DailyBonus}** Protobucks, and received 1 Daily Coin.\nStreak: {1 + user.DailyStreak} *(Every week, get a bonus!)*");
+        } else {
+          await MongoHelper.UpdateUser(user.Id, "Money", (user.Money + 500 + user.DailyBonus));
+          dailySuccess.AddField("Daily Claimed!", $"<@{user.Id}>, you received **{500 + user.DailyBonus}** Protobucks as a daily reward!\nYou now have **{user.Money + 500 + user.DailyBonus}** Protobucks, and received 1 Daily Coin.\nStreak: {1 + user.DailyStreak} *(Every week, get a bonus!)*");
+        }
+        await MongoHelper.UpdateUser(user.Id, "DailyStreak", (user.DailyStreak + 1));
+      } 
+
+      // Command was executed outside of 48 hours.
+      else {
+        await MongoHelper.UpdateUser(user.Id, "Money", (user.Money + 500 + user.DailyBonus));
+        await MongoHelper.UpdateUser(user.Id, "DailyStreak", 1);
+        dailySuccess.AddField("Daily Claimed!", $"<@{user.Id}>, you received **{500 + user.DailyBonus}** Protobucks as a daily reward{(user.DailyStreak == 0 ? "!" : $", but lost your daily streak of {user.DailyStreak}!")}\nYou now have **{user.Money + 500 + user.DailyBonus}** Protobucks, and received 1 Daily Coin.\nStreak: 1 *(Every week, get a bonus!)*");
       }
 
-      //Add 500 with the User's Daily Bonus, and Last Dailies
-      await MongoHelper.UpdateUser(user.Id, "Money", (user.Money + 500 + user.DailyBonus));
       await MongoHelper.UpdateUser(user.Id, "LastDaily", currentTime);
       await MongoHelper.UpdateInventory(user.Id, "DailyCoins", (inv.DailyCoins + 1));
       await MongoHelper.UpdateInventory(user.Id, "DailyCoinsTotal", (inv.DailyCoinsTotal + 1));
-
-      var dailySuccess = new EmbedBuilder();
       dailySuccess.WithColor(0xB2A2F1);
-      dailySuccess.AddField("Daily Claimed!", $"<@{user.Id}>, you have received **{500 + user.DailyBonus}** Protobucks as a daily reward!\nYou now have **{user.Money + 500 + user.DailyBonus}** Protobucks, and received 1 Daily Coin.");
       dailySuccess.WithThumbnailUrl(Context.User.GetAvatarUrl());
 
       await Context.Channel.SendMessageAsync("", false, dailySuccess.Build());

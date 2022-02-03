@@ -31,7 +31,7 @@ namespace PrototonBot.Commands {
         embed.WithThumbnailUrl(Context.Guild.GetUser(Program.UserID).GetAvatarUrl());
         embed.WithFooter($"Replying to: {Context.User.Username}");
         embed.AddField($"``{serverObj.Prefix}buy Boosted`` - 30,000 Protobucks", "Get a 5% multiplier on Chat EXP and Protobucks!");
-        embed.AddField($"``{serverObj.Prefix}buy ProfileTheme`` - 10,000 Dogbucks", $"Purchase a profile theme that you can keep and swap! More info with `{serverObj.Prefix}help themes`");
+        embed.AddField($"``{serverObj.Prefix}buy ProfileTheme`` - 10,000 Protobucks", $"Purchase a profile theme that you can keep and swap! More info with `{serverObj.Prefix}help themes`");
         embed.AddField($"``{serverObj.Prefix}buy DailyPat`` - 3,000 Protobucks", "Restore your daily pat so that you can give another one!");
         embed.AddField("Your Protobucks", user.Money);
         await Context.Channel.SendMessageAsync("", false, embed.Build());
