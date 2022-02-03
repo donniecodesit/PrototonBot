@@ -232,6 +232,11 @@ namespace PrototonBot.Commands {
       }
 
       if (item.ToLower() == "dailybonus" || item.ToLower() == "daily") {
+        if (user.DailyBonus >= 5000) {
+          await Context.Channel.SendMessageAsync($"My apologies, but the limit to Daily Bonus caps at 5000 Protobucks! =( <@{user.Id}>");
+          return;
+        }
+        
         if (inv.DailyCoins >= 7) {
           await Context.Channel.SendMessageAsync($"Wowza, you really are devoted! I'll take these 7 Daily Coins from you and fuse them into your soul...\nNow you earn 100 more Protobucks on your dailies! <@{user.Id}>");
           await MongoHelper.UpdateInventory(user.Id, "DailyCoins", (inv.DailyCoins - 7));
