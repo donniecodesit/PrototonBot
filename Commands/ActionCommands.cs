@@ -114,7 +114,7 @@ namespace PrototonBot.Commands {
         return;
       }
 
-      await Context.Channel.SendMessageAsync($"{Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result.Username}, you have been punished by {Context.User.Username} for being too **lewd*!");
+      await Context.Channel.SendMessageAsync($"{Context.Client.GetUserAsync(Convert.ToUInt64(filteredId)).Result.Username}, you have been punished by {Context.User.Username} for being too **lewd**!");
       return;
     }
 
