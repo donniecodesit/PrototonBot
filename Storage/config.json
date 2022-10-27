@@ -1,0 +1,15 @@
+{
+  "BotMainServer": HomeServerIDHere,
+  "ApplicationID": BotUserIDHere,
+  "GitHubRepoURL": "RepoURLHere",
+  "MongoURL": "mongodb://localhost",
+  "Timezone": "MST",
+  "DeveloperIDs": [
+    "285937628363227138",
+    "103610948526284800"
+  ],
+  "tokens": {
+    "discord": "DiscordTokenHere"
+  },
+  "CacheDir": "/tmp/prototon"
+}

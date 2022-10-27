@@ -24,7 +24,7 @@ The time, people, and resources to do this are unavailable. Follow the instructi
 
 ### Requirements
 Before building this bot and setting it up, you're going to need these requirements.
-- .NET is required for this bot to compile. Version 5.0.x is used in production: [Download Here](https://dotnet.microsoft.com/download/dotnet/5.0)
+- .NET is required for this bot to compile. Version 6.0.x is used in production: [Download Here](https://dotnet.microsoft.com/download/dotnet/5.0)
 - MongoDB is required for this bot to operate. Version 4.4.x is used in production: [Download Here](https://www.mongodb.com/try/download/community)
 - Otherwise, making sure to properly follow setup. To test the Mongo databast locally, you can run it on `localhost`.
 
