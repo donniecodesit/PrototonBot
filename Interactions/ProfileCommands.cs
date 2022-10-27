@@ -680,8 +680,9 @@ namespace PrototonBot.Interactions
         }
 
         [SlashCommand("profile", "[profile] View a user's full profile")]
-        public async Task ProfileCommand([Summary(description: "A tagged user (@)")] SocketUser user)
+        public async Task ProfileCommand([Summary(description: "A tagged user (@)")] SocketUser user = null)
         {
+            if (user == null) user = Context.User;
             Directory.CreateDirectory(Program.CacheDir);
             var webClient = new WebClient();
 
