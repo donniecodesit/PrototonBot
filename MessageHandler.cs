@@ -32,19 +32,26 @@ namespace PrototonBot
 
         private async Task HandleMessageAsync(SocketMessage socketMessage)
         {
-            // Stop if system message, a bot, null/empty, or web integration user. Reply if DM.
+            // Ignore if the message is not from a user, and stop if in DMs.
             var message = socketMessage as SocketUserMessage;
             if (message == null || message.Source != MessageSource.User || message.Author.IsBot) return;
             if (message.Channel.GetType() == typeof(SocketDMChannel)) { await message.ReplyAsync("Only slash commands are supported in DMs."); return; }
 
-            // The message was from a user, now run any and all checks.
+            // create the user if they don't exist, then update their money, xp, and level.
             if (MongoHandler.GetUser(message.Author.Id.ToString()).Result == null) await MongoHandler.CreateNewUser(message.Author);
             await Utilities.chatReward(message.Author);
             await Utilities.LevelUpdater(message);
 
-            // Get the user and server, check if either have had their primary name changed to update in the DB.
+            // Fetch the user and server information and update the name value if it has changed.
             var user = MongoHandler.GetUser(message.Author.Id.ToString()).Result;
             var server = MongoHandler.GetServer(((SocketGuildChannel)message.Channel).Guild.Id.ToString()).Result;
+
+            if (server == null)
+            {
+                await MongoHandler.CreateNewServer(((SocketGuildChannel)message.Channel).Guild);
+                server = MongoHandler.GetServer(((SocketGuildChannel)message.Channel).Guild.Id.ToString()).Result;
+            }
+
             if (user.Name != message.Author.Username) await MongoHandler.UpdateUser(user.Id, "Name", message.Author.Username);
             if (server.Name != ((SocketGuildChannel)message.Channel).Guild.Name) await MongoHandler.UpdateServer(server.Id, "Name", ((SocketGuildChannel)message.Channel).Guild.Name);
 

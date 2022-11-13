@@ -124,6 +124,7 @@ namespace PrototonBot.MongoUtility
             userObj.Donations = 0;
             userObj.TransferIn = 0;
             userObj.TransferOut = 0;
+            userObj.BadgeSlots = new List<string>() { "none", "none", "none", "none", "none", "none", "none", "none", "none" };
             userCollection.InsertOne(userObj);
 
             var userInv = new InventoryObject();

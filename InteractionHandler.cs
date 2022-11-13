@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using System.Reflection;
+using PrototonBot.MongoUtility;
 
 namespace PrototonBot
 {
@@ -53,6 +54,28 @@ namespace PrototonBot
             {
                 // Create an execution context that matches the type parameter of your modules.
                 var context = new SocketInteractionContext(_client, arg);
+
+                // create the user if they don't exist. XP, Money, and Level do not apply to slash commands.
+                if (MongoHandler.GetUser(context.Interaction.User.Id.ToString()).Result == null) await MongoHandler.CreateNewUser(context.Interaction.User);
+
+                // Fetch the user information and update the name value if it has changed.
+                var user = MongoHandler.GetUser(context.Interaction.User.Id.ToString()).Result;
+                if (user.Name != context.Interaction.User.Username) await MongoHandler.UpdateUser(user.Id, "Name", context.Interaction.User.Username);
+
+                // Fetch the server information and update the name value if it has changed.
+                if (context.Guild != null)
+                {
+                    var server = MongoHandler.GetServer(context.Guild.Id.ToString()).Result;
+                    if (server == null)
+                    {
+                        await MongoHandler.CreateNewServer(context.Guild);
+                        server = MongoHandler.GetServer(context.Guild.Id.ToString()).Result;
+                    }
+                    if (server.Name != context.Guild.Name) await MongoHandler.UpdateServer(context.Guild.Id.ToString(), "Name", context.Guild.Name);
+
+                }
+
+                // Finally, execute the requested command.
                 await _commands.ExecuteCommandAsync(context, _services);
             }
             catch (Exception ex)

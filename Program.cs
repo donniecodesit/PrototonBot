@@ -107,7 +107,7 @@ namespace PrototonBot
 
             await _client.LoginAsync(TokenType.Bot, config["tokens:discord"]);
             await _client.SetStatusAsync(UserStatus.Online);
-            await _client.SetGameAsync("protogen sounds!", null, ActivityType.Listening);
+            await _client.SetGameAsync("for / commands. 👀", null, ActivityType.Watching);
             await _client.StartAsync();
 
             MongoURL = config["MongoURL"];
