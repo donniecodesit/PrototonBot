@@ -1,6 +1,6 @@
 <div align="center">
-   <img alt="PrototonBot" src="https://i.imgur.com/2aCduA6.png"/>
-   <a href="https://discord.gg/8kMjSYspPY"><img alt="Discord" src="https://img.shields.io/discord/919135423090024499?color=%238D59FF&label=Discord%20Support%20Server"></a>
+   <img alt="PrototonBot" src="https://i.imgur.com/u1P1HsE.png"/>
+   <a href="https://discord.gg/8kMjSYspPY"><img alt="Discord" src="https://img.shields.io/discord/919135423090024499?color=%23FFAB59&label=Discord%20Support%20Server"></a>
 </div>
 
 # What is Prototon Bot?
@@ -9,7 +9,7 @@
 
 *ProtogenBot's current icon was made via [Mod's Protogen Creator](https://picrew.me/image_maker/362292)*
 
-PrototonBot is the successor to ShepherdBot Classic, a Discord Bot written by [Donovan Laws](https://github.com/donovanlaws).
+PrototonBot is the successor to ShepherdBot Classic, a Discord Bot written by [DonnieCodesIt](https://github.com/donniecodesit).
 The previous bot had been written in JavaScript and was later rewritten and improved in 2020 in C# with Discord.Net.
 The old bot has been since discontinued and is now being completely revised and renewed as of 2022, using everything I've learned about programming so far.
 I've also been taking an Engineering course at Thinkful and have learned a lot about JavaScript and Front-End and Back-End development, but that's not quite related to this bot.
@@ -73,4 +73,4 @@ I do not mind users using this bot, please use and follow the same license agree
 ## License
 This project is licensed under the Creative Commons BY-NC-SA 4.0 License.
 
-You can read about the license [here](https://creativecommons.org/licenses/by-nc-sa/4.0), or the full license text in [license.txt](https://github.com/donovanlaws/PrototonBot/blob/main/license.txt).
+You can read about the license [here](https://creativecommons.org/licenses/by-nc-sa/4.0), or the full license text in [license.txt](https://github.com/donniecodesit/PrototonBot/blob/main/license.txt).

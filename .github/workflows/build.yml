@@ -1,0 +1,32 @@
+name: Builds
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+    branches: [ "main" ]
+
+env:
+  DOTNET_INSTALL_DIR: ./dotnet
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: [self-hosted, Linux, X64]
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    - name: Setup environment
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build project
+      run: dotnet publish --configuration release --no-restore
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Prototon x64
+        path: bin/release/net6.0/publish/

@@ -62,7 +62,7 @@ namespace PrototonBot.Interactions
             _embed.WithColor(0xB2A2F1);
             _embed.WithThumbnailUrl(guild.IconUrl);
             _embed.WithTitle($"{guild.Name} Information");
-            _embed.AddField("Server Information", $"Server ID: `{guild.Id}`\nCreated At: `{guild.CreatedAt}`\nOwner: `{guild.Owner}`\nMembers: `{guild.MemberCount}`\nRoles: `{guild.Roles.Count}`\nVerification Level: `{guild.VerificationLevel}`\n Level Messages: `{mongoSvr.LevelUpMessages}`\nServer Public: `{mongoSvr.Public}` (TBD)`");
+            _embed.AddField("Server Information", $"Server ID: `{guild.Id}`\nCreated At: `{guild.CreatedAt}`\nOwner: `{guild.Owner}`\nMembers: `{guild.MemberCount}`\nRoles: `{guild.Roles.Count}`\nVerification Level: `{guild.VerificationLevel}`\n Level Messages: `{mongoSvr.LevelUpMessages}`\nServer Public: `{mongoSvr.Public} (TBD)`");
 
             await RespondAsync("", embed: _embed.Build());
         }
@@ -78,7 +78,7 @@ namespace PrototonBot.Interactions
             _embed.WithColor(0xB2A2F1);
             _embed.WithTitle("Welcome to PrototonBot!");
             _embed.WithThumbnailUrl(Context.Client.GetUser(Context.Client.GetApplicationInfoAsync().Result.Id).GetAvatarUrl());
-            _embed.WithDescription($"PrototonBot is the successor to ShepherdBot Classic, a Discord Bot written for entertainment purposes with interactive commands. Mother language was JavaScript (Discord.js), later rewritten in C# (Discord.NET).\nIt is receiving occasional updates and cleanup. Features and ideas are brainstormed and only implemented when possible.");
+            _embed.WithDescription($"PrototonBot is the successor to ShepherdBot Classic, a Discord Bot written for entertainment purposes with interactive commands. Mother language was JavaScript (Discord.js), later rewritten in C# (Discord.NET).\n\nIt is receiving occasional updates and cleanup. Features and ideas are brainstormed and only implemented when possible.");
             _embed.AddField("Invite Bot", $"[Invite Link](https://discord.com/oauth2/authorize?client_id={Context.Client.GetApplicationInfoAsync().Result.Id}&scope=bot&permissions=3198016)", true);
             _embed.AddField("Last Restart", $"{Program.LastRestartTime} {Program.TimeZone}", true);
             _embed.WithFooter($"{(gitValid ? "You can report bugs/issues to the GitHub Page's Issues Tab" : "")}\nBuilt with Visual Studio and Discord.NET");
