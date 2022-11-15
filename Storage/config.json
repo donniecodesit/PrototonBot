@@ -12,5 +12,5 @@
     "discord": "DiscordTokenHere"
   },
   "CacheDir": "/tmp/prototon",
-  "ActiveRedeemCodes": []
+  "ActiveRedeemCodes": ["notavalidcode"]
 }
