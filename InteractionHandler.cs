@@ -80,8 +80,8 @@ namespace PrototonBot
 
                 if (!mongoSvr.EnabledChannels.Contains(context.Channel.Id.ToString()) && !(context.Interaction.User as SocketGuildUser).GetPermissions(context.Channel as SocketGuildChannel).ManageChannel)
                 {
-                    await context.Interaction.RespondAsync("Commands are not enabled in this channel.");
-                    await Task.Delay(4000);
+                    await context.Interaction.RespondAsync("Commands aren't on in this channel. Admins can enable channels using `/admin channelenable`.");
+                    await Task.Delay(6000);
                     await context.Interaction.DeleteOriginalResponseAsync();
                     return;
                 } else
