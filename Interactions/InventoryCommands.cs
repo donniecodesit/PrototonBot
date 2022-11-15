@@ -365,16 +365,16 @@ namespace PrototonBot.Interactions
                 }
                 if (inv.WrenchUses == 1 && inv.Wrenches >= 2)
                 {
-                    if (GearsGet >= 4) GearsGet -= 6;
-                    if (BoltsGet >= 1) BoltsGet -= 2;
+                    if (GearsGet >= 4) GearsGet -= 4;
+                    if (BoltsGet >= 1) BoltsGet -= 1;
                     await RespondAsync($"<@{user.Id}> broke one of their wrenches turning it too aggressively!\nThey got {BoltsGet} :nut_and_bolt: and {GearsGet} :gear:!");
                     await MongoHandler.UpdateInventory(user.Id, "WrenchUses", 10);
                     await MongoHandler.UpdateInventory(user.Id, "Wrenches", (inv.Wrenches - 1));
                 }
                 if (inv.WrenchUses == 1 && inv.Wrenches == 1)
                 {
-                    if (GearsGet >= 4) GearsGet -= 6;
-                    if (BoltsGet >= 1) BoltsGet -= 2;
+                    if (GearsGet >= 4) GearsGet -= 4;
+                    if (BoltsGet >= 1) BoltsGet -= 1;
                     await RespondAsync($"<@{user.Id}> broke their only wrench turning it too aggressively!\nThey got {BoltsGet} :nut_and_bolt: and {GearsGet} :gear:!");
                     await MongoHandler.UpdateInventory(user.Id, "WrenchUses", (inv.WrenchUses - 1));
                     await MongoHandler.UpdateInventory(user.Id, "Wrenches", (inv.Wrenches - 1));
