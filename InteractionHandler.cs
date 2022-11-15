@@ -62,6 +62,9 @@ namespace PrototonBot
                 var user = MongoHandler.GetUser(context.Interaction.User.Id.ToString()).Result;
                 if (user.Name != context.Interaction.User.Username) await MongoHandler.UpdateUser(user.Id, "Name", context.Interaction.User.Username);
 
+                await Utilities.chatReward(context.Interaction.User);
+                await Utilities.interactionLevelUpdater(context.Interaction);
+
                 // Fetch the server information and update the name value if it has changed.
                 if (context.Guild != null)
                 {

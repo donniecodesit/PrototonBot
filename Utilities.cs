@@ -85,6 +85,26 @@ namespace PrototonBot
             return Task.CompletedTask;
         }
 
+        // Handle checking if the user is ready to level up and inform them (depending on if it's enabled)
+        public static async Task interactionLevelUpdater(SocketInteraction interaction)
+        {
+            var user = MongoHandler.GetUser(interaction.User.Id.ToString()).Result;
+            var server = MongoHandler.GetServer((interaction.User as SocketGuildUser).Guild.Id.ToString()).Result;
+            long currentLevel = (long)Math.Floor((170 + Math.Sqrt(28900 - (6 * 310 * -user.EXP))) / 620);
+
+            if (currentLevel != user.Level)
+            {
+                // Reply with a level up message is the level has changed, and level up messages are enabled.
+                if (server.LevelUpMessages)
+                    await interaction.Channel.SendMessageAsync($":tada: **Congratulations, {interaction.User.Username}, you've reached Level {currentLevel}!** :tada:");
+
+                // Regardless of if a reply was sent, now update the user's level.
+                await MongoHandler.UpdateUser(interaction.User.Id.ToString(), "Level", currentLevel);
+            }
+            return;
+        }
+
+
         // Take the input of a ping (formatted ID), or a raw ID to validate their presence in the server.
         public static string? FilterUserIdInput(SocketCommandContext context, string input)
         {
