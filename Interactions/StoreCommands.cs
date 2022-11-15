@@ -430,6 +430,7 @@ namespace PrototonBot.Interactions
                         var usedCodes = mongoUsr.RedeemedCodes;
                         usedCodes.Add(code);
                         await MongoHandler.UpdateUser(mongoUsr.Id, "RedeemedCodes", usedCodes);
+                        await MongoHandler.UpdateUser(mongoUsr.Id, "TransferIn", mongoUsr.TransferIn + 11000);
                         await MongoHandler.UpdateUser(mongoUsr.Id, "Money", mongoUsr.Money + 11000);
                         await RespondAsync("Code redeemed! You've been given: 11000 Protobucks!");
                         break;
