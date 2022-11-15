@@ -457,7 +457,6 @@ namespace PrototonBot.Interactions
                     await MongoHandler.UpdateUser(author.Id, "Mutuals", true);
                     await MongoHandler.UpdateUser(partner.Id, "Mutuals", true);
                     await RespondAsync($"Awe, nice! You and <@{partner.Id}> are now mutual partners!");
-                    return;
                 }
 
                 if (currentPartner.Partner == Context.User.Id.ToString())
