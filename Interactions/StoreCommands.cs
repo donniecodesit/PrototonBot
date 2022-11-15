@@ -412,5 +412,32 @@ namespace PrototonBot.Interactions
                 }
             }
         }
+
+        [SlashCommand("redeem", "[store] Redeem a code for a reward!")]
+        public async Task RedeemCode([Summary(description: "The code you would like to redeem.")] String code)
+        {
+            var mongoUsr = MongoHandler.GetUser(Context.Interaction.User.Id.ToString()).Result;
+
+            // If there are no active codes, stop. If the code was not an active one, stop. If the user has used it already, stop. Otherwise, continue.
+            if (Program.ActiveRedeemCodes == null) await RespondAsync("There are currently no active codes.");
+            else if (!Program.ActiveRedeemCodes.Contains(code)) await RespondAsync("That was not a valid active code.");
+            else if (mongoUsr.RedeemedCodes.Contains(code)) await RespondAsync("You've already redeemed that code!");
+            else
+            {
+                switch (code)
+                {
+                    case "PrototonBeta2022":
+                        var usedCodes = mongoUsr.RedeemedCodes;
+                        usedCodes.Add(code);
+                        await MongoHandler.UpdateUser(mongoUsr.Id, "RedeemedCodes", usedCodes);
+                        await MongoHandler.UpdateUser(mongoUsr.Id, "Money", mongoUsr.Money + 11000);
+                        await RespondAsync("Code redeemed! You've been given: 11000 Protobucks!");
+                        break;
+                    default:
+                        await RespondAsync("That was not a valid active code.");
+                        break;
+                }
+            }
+        }
     }
 }

@@ -11,5 +11,6 @@
   "tokens": {
     "discord": "DiscordTokenHere"
   },
-  "CacheDir": "/tmp/prototon"
+  "CacheDir": "/tmp/prototon",
+  "ActiveRedeemCodes": []
 }

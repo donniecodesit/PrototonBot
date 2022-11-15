@@ -21,6 +21,7 @@ namespace PrototonBot
         public static string? BotAvatarUrl;
         public static string? ApplicationID;
         public static string? CacheDir;
+        public static List<string>? ActiveRedeemCodes;
 
         public static Task Main() => new Program().MainAsync();
 
@@ -126,6 +127,7 @@ namespace PrototonBot
             TimeZone = config["Timezone"];
             CacheDir = config["CacheDir"];
             ApplicationID = config["ApplicationID"];
+            ActiveRedeemCodes = config.GetSection("ActiveRedeemCodes").Get<string[]>().ToList();
 
             await Task.Delay(-1);
         }

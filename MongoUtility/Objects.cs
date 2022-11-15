@@ -31,6 +31,7 @@ namespace PrototonBot.MongoUtility
         public long TransferIn { get; set; }
         public long TransferOut { get; set; }
         public List<string> BadgeSlots { get; set; }
+        public List<string> RedeemedCodes { get; set; }
     }
 
     public class ServerObject
