@@ -129,7 +129,7 @@ namespace PrototonBot.Interactions
                 }
                 else
                 {
-                    await MongoHandler.UpdateInventory(Context.Guild.Id.ToString(), "WelcomeMessages", true);
+                    await MongoHandler.UpdateServer(Context.Guild.Id.ToString(), "WelcomeMessages", true);
                     await RespondAsync($":white_check_mark: Welcome messages are now enabled for {Context.Guild.Name}!");
                     return;
                 }
@@ -143,7 +143,7 @@ namespace PrototonBot.Interactions
                 }
                 else
                 {
-                    await MongoHandler.UpdateInventory(Context.Guild.Id.ToString(), "WelcomeMessages", false);
+                    await MongoHandler.UpdateServer(Context.Guild.Id.ToString(), "WelcomeMessages", false);
                     await RespondAsync($":white_check_mark: Welcome messages are now disabled for {Context.Guild.Name}!");
                     return;
                 }
@@ -163,7 +163,7 @@ namespace PrototonBot.Interactions
                 }
                 else
                 {
-                    await MongoHandler.UpdateInventory(Context.Guild.Id.ToString(), "LevelUpMessages", true);
+                    await MongoHandler.UpdateServer(Context.Guild.Id.ToString(), "LevelUpMessages", true);
                     await RespondAsync($":white_check_mark: Level Up messages are now enabled for {Context.Guild.Name}!");
                     return;
                 }
@@ -177,7 +177,7 @@ namespace PrototonBot.Interactions
                 }
                 else
                 {
-                    await MongoHandler.UpdateInventory(Context.Guild.Id.ToString(), "LevelUpMessages", false);
+                    await MongoHandler.UpdateServer(Context.Guild.Id.ToString(), "LevelUpMessages", false);
                     await RespondAsync($":white_check_mark: Level Up messages are now disabled for {Context.Guild.Name}!");
                     return;
                 }
@@ -199,7 +199,7 @@ namespace PrototonBot.Interactions
                 }
                 else
                 {
-                    await MongoHandler.UpdateInventory(Context.Guild.Id.ToString(), "Public", true);
+                    await MongoHandler.UpdateServer(Context.Guild.Id.ToString(), "Public", true);
                     await RespondAsync($":white_check_mark: {Context.Guild.Name} ia now a public server!");
                     return;
                 }
@@ -213,7 +213,7 @@ namespace PrototonBot.Interactions
                 }
                 else
                 {
-                    await MongoHandler.UpdateInventory(Context.Guild.Id.ToString(), "Public", false);
+                    await MongoHandler.UpdateServer(Context.Guild.Id.ToString(), "Public", false);
                     await RespondAsync($":white_check_mark: {Context.Guild.Name} is now a private server!");
                     return;
                 }

@@ -75,8 +75,20 @@ namespace PrototonBot
 
                 }
 
-                // Finally, execute the requested command.
-                await _commands.ExecuteCommandAsync(context, _services);
+                // Only accept slash commands if the channel is enabled or if the user is an admin.
+                var mongoSvr = MongoHandler.GetServer(context.Guild.Id.ToString()).Result;
+
+                if (!mongoSvr.EnabledChannels.Contains(context.Channel.Id.ToString()) && !(context.Interaction.User as SocketGuildUser).GetPermissions(context.Channel as SocketGuildChannel).ManageChannel)
+                {
+                    await context.Interaction.RespondAsync("Commands are not enabled in this channel.");
+                    await Task.Delay(4000);
+                    await context.Interaction.DeleteOriginalResponseAsync();
+                    return;
+                } else
+                {
+                    // Finally, execute the requested command.
+                    await _commands.ExecuteCommandAsync(context, _services);
+                }
             }
             catch (Exception ex)
             {

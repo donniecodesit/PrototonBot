@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Discord.Interactions;
 using PrototonBot.Log;
+using PrototonBot.MongoUtility;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -64,7 +65,7 @@ namespace PrototonBot
                         LogLevel = LogSeverity.Debug,
                         DefaultRunMode = Discord.Commands.RunMode.Async
                     }))
-                    .AddSingleton<MessageHandler>())
+                    .AddSingleton<ServiceHandler>())
                 .Build();
             await RunAsync(host);
         }
@@ -85,8 +86,8 @@ namespace PrototonBot
             // Subscribe to Interaction Log Events
             slashCommands.Log += _ => provider.GetRequiredService<ConsoleLogger>().Log(_);
 
-            var messageHandler = provider.GetRequiredService<MessageHandler>();
-            await messageHandler.InitializeAsync();
+            var serviceHandler = provider.GetRequiredService<ServiceHandler>();
+            await serviceHandler.InitializeAsync();
 
             _client.Ready += async () =>
             {
@@ -102,6 +103,14 @@ namespace PrototonBot
                 {
                     await slashCommands.RegisterCommandsGloballyAsync(true);
 
+                }
+
+                foreach (var server in _client.Guilds)
+                {
+                    if (MongoHandler.GetServer(server.Id.ToString()).Result == null)
+                    {
+                        await MongoHandler.CreateNewServer(server);
+                    }
                 }
             };
 
