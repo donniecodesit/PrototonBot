@@ -75,8 +75,8 @@ namespace PrototonBot
 
             if (currentLevel != user.Level)
             {
-                // Reply with a level up message is the level has changed, messages are enabled, and the channel is bot-enabled.
-                if (server.LevelUpMessages && server.EnabledChannels.Contains(message.Channel.Id.ToString()))
+                // Reply with a level up message is the level has changed, and level up messages are enabled.
+                if (server.LevelUpMessages)
                     message.ReplyAsync($":tada: **Congratulations, {message.Author.Username}, you've reached Level {currentLevel}!** :tada:");
 
                 // Regardless of if a reply was sent, now update the user's level.
