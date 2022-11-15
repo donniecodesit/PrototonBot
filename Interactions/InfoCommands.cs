@@ -45,7 +45,7 @@ namespace PrototonBot.Interactions
         {
             var _embed = new EmbedBuilder();
             _embed.WithTitle("Want to invite the bot?");
-            _embed.WithColor(0xB2A2F1);
+            _embed.WithColor(0xFFAB59);
             _embed.WithDescription("Appeciated! All shares and invites of the bot are encouraged, as it helps the bot grow, and increases the network of users to think of possibilities, ideas, or help find bugs or problems.\nClick the blue hyperlink above to invite, or click the bot's profile.");
             _embed.WithThumbnailUrl(Context.Guild.GetUser(Context.Client.GetApplicationInfoAsync().Result.Id).GetAvatarUrl());
             _embed.WithUrl($"https://discord.com/oauth2/authorize?client_id={Context.Client.GetApplicationInfoAsync().Result.Id}&scope=bot&permissions=3198016");
@@ -59,7 +59,7 @@ namespace PrototonBot.Interactions
             var mongoSvr = MongoHandler.GetServer(Context.Guild.Id.ToString()).Result;
             var _embed = new EmbedBuilder();
             var guild = Context.Guild;
-            _embed.WithColor(0xB2A2F1);
+            _embed.WithColor(0xFFAB59);
             _embed.WithThumbnailUrl(guild.IconUrl);
             _embed.WithTitle($"{guild.Name} Information");
             _embed.AddField("Server Information", $"Server ID: `{guild.Id}`\nCreated At: `{guild.CreatedAt}`\nOwner: `{guild.Owner}`\nMembers: `{guild.MemberCount}`\nRoles: `{guild.Roles.Count}`\nVerification Level: `{guild.VerificationLevel}`\n Level Messages: `{mongoSvr.LevelUpMessages}`\nServer Public: `{mongoSvr.Public} (TBD)`");
@@ -75,7 +75,7 @@ namespace PrototonBot.Interactions
             var gitValid = githubRepo != "RepoURLHere" && githubRepo != "";
 
             var _embed = new EmbedBuilder();
-            _embed.WithColor(0xB2A2F1);
+            _embed.WithColor(0xFFAB59);
             _embed.WithTitle("Welcome to PrototonBot!");
             _embed.WithThumbnailUrl(Context.Client.GetUser(Context.Client.GetApplicationInfoAsync().Result.Id).GetAvatarUrl());
             _embed.WithDescription($"PrototonBot is the successor to ShepherdBot Classic, a Discord Bot written for entertainment purposes with interactive commands. Mother language was JavaScript (Discord.js), later rewritten in C# (Discord.NET).\n\nIt is receiving occasional updates and cleanup. Features and ideas are brainstormed and only implemented when possible.");

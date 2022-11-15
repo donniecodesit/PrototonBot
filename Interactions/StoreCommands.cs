@@ -24,7 +24,7 @@ namespace PrototonBot.Interactions
             if (page == 0)
             {
                 var _embed = new EmbedBuilder();
-                _embed.WithColor(0xB2A2F1);
+                _embed.WithColor(0xFFAB59);
                 _embed.WithTitle("PrototonBot Store Directory");
                 _embed.WithThumbnailUrl(Context.Client.GetUser(Context.Client.GetApplicationInfoAsync().Result.Id).GetAvatarUrl());
                 _embed.WithDescription("PrototonBot has different store pages you can view! Which one do you want?");
@@ -38,7 +38,7 @@ namespace PrototonBot.Interactions
             if (page == 1)
             {
                 var _embed = new EmbedBuilder();
-                _embed.WithColor(0xB2A2F1);
+                _embed.WithColor(0xFFAB59);
                 _embed.WithTitle("PrototonBot Store - Page 1");
                 _embed.WithThumbnailUrl(Context.Client.GetUser(Context.Client.GetApplicationInfoAsync().Result.Id).GetAvatarUrl());
                 _embed.AddField($"``/buy profiletheme THEMENAME`` - 10,000 Protobucks", $"Purchase a profile theme that you can keep and equip.");
@@ -51,7 +51,7 @@ namespace PrototonBot.Interactions
             if (page == 2)
             {
                 var _embed = new EmbedBuilder();
-                _embed.WithColor(0xB2A2F1);
+                _embed.WithColor(0xFFAB59);
                 _embed.WithTitle("PrototonBot Store - Page 2");
                 _embed.WithThumbnailUrl(Context.Client.GetUser(Context.Client.GetApplicationInfoAsync().Result.Id).GetAvatarUrl());
                 _embed.AddField($":axe: ``/buy item axe`` - 1000 Protobucks", $"Allows you to use ``/chopdown``!");
@@ -64,7 +64,7 @@ namespace PrototonBot.Interactions
             if (page == 3)
             {
                 var _embed = new EmbedBuilder();
-                _embed.WithColor(0xB2A2F1);
+                _embed.WithColor(0xFFAB59);
                 _embed.WithTitle("PrototonBot Store - Page 3");
                 _embed.WithThumbnailUrl(Context.Client.GetUser(Context.Client.GetApplicationInfoAsync().Result.Id).GetAvatarUrl());
                 _embed.AddField($"``/buy badge lgbtflag`` - 1000 Protobucks", $"LGBT Pride Flag");
@@ -141,7 +141,7 @@ namespace PrototonBot.Interactions
             else
             {
                 var _embed = new EmbedBuilder();
-                _embed.WithColor(0xB2A2F1);
+                _embed.WithColor(0xFFAB59);
                 _embed.WithTitle("PrototonBot Upgrade Shop");
                 _embed.WithThumbnailUrl(Context.Client.GetUser(Context.Client.GetApplicationInfoAsync().Result.Id).GetAvatarUrl());
                 _embed.WithDescription($"Hey! Welcome to the super magic Upgrade Shop! We take those amazing coins you've earned from using our services and infuse them with your profile to give you better statistics all around! Currently, we provide 2 stats. <@{mongoUsr.Id}>");

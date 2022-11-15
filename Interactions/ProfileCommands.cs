@@ -33,12 +33,12 @@ namespace PrototonBot.Interactions
             if (Utilities.IsUserDeveloper(user.Id.ToString()))
             {
                 _embed.WithTitle($":star2: {user.Username}'s Wallet :star2:");
-                _embed.WithColor(0xB285FE);
+                _embed.WithColor(0xFFAB59);
             }
             else
             {
                 _embed.WithTitle($"{user.Username}'s Wallet");
-                _embed.WithColor(0xB2A2F1);
+                _embed.WithColor(0xFFAB59);
             }
 
             _embed.AddField("Account Holder", mongoUsr.Name, true);
@@ -77,13 +77,13 @@ namespace PrototonBot.Interactions
             if (Utilities.IsUserDeveloper(user.Id.ToString()))
             {
                 _embed.WithTitle($":star2: {user.Username}'s Profile :star2:");
-                _embed.WithColor(0xB285FE);
+                _embed.WithColor(0xFFAB59);
                 _embed.WithDescription($"This user is a developer for PrototonBot!\n{mongoUsr.Description}");
             }
             else
             {
                 _embed.WithTitle($"{user.Username}'s Profile");
-                _embed.WithColor(0xB2A2F1);
+                _embed.WithColor(0xFFAB59);
                 _embed.WithDescription($"{mongoUsr.Description}");
             }
 
@@ -160,12 +160,12 @@ namespace PrototonBot.Interactions
             if (Utilities.IsUserDeveloper(user.Id.ToString()))
             {
                 _embed.WithTitle($":star2: {user.Username}'s Inventory :star2:");
-                _embed.WithColor(0xB285FE);
+                _embed.WithColor(0xFFAB59);
             }
             else
             {
                 _embed.WithTitle($"{user.Username}'s Inventory");
-                _embed.WithColor(0xB2A2F1);
+                _embed.WithColor(0xFFAB59);
             }
             _embed.WithThumbnailUrl(Context.Client.GetUserAsync(Convert.ToUInt64(user.Id.ToString())).Result.GetAvatarUrl());
             _embed.WithFooter("Numbers in parenthesis are how many uses that item has left.");
@@ -203,7 +203,7 @@ namespace PrototonBot.Interactions
                 string str = spanOfTime.Hours + " hour(s), " + spanOfTime.Minutes + " minute(s), and " + spanOfTime.Seconds + " second(s)!";
 
                 var dailyRejected = new EmbedBuilder();
-                dailyRejected.WithColor(0xB2A2F1);
+                dailyRejected.WithColor(0xFFAB59);
                 dailyRejected.AddField("Daily Already Claimed!", $"<@{mongoUsr.Id}>, You've already claimed your daily today!\nGet your next one in {str}");
                 dailyRejected.WithThumbnailUrl(Context.User.GetAvatarUrl());
 
@@ -241,7 +241,7 @@ namespace PrototonBot.Interactions
             await MongoHandler.UpdateUser(mongoUsr.Id, "LastDaily", currentTime);
             await MongoHandler.UpdateInventory(mongoUsr.Id, "DailyCoins", (mongoInv.DailyCoins + 1));
             await MongoHandler.UpdateInventory(mongoUsr.Id, "DailyCoinsTotal", (mongoInv.DailyCoinsTotal + 1));
-            dailySuccess.WithColor(0xB2A2F1);
+            dailySuccess.WithColor(0xFFAB59);
             dailySuccess.WithThumbnailUrl(Context.User.GetAvatarUrl());
 
             await RespondAsync("", embed: dailySuccess.Build());
@@ -281,7 +281,7 @@ namespace PrototonBot.Interactions
                 string str = spanOfTime.Hours + " hours, " + spanOfTime.Minutes + " minutes, and " + spanOfTime.Seconds + " seconds!";
 
                 var dailyPatRejected = new EmbedBuilder();
-                dailyPatRejected.WithColor(0xB2A2F1);
+                dailyPatRejected.WithColor(0xFFAB59);
                 dailyPatRejected.AddField("Pat Already Claimed!", $"You've already given a pat today!\nYou can give another one in {str}");
                 await RespondAsync("", embed: dailyPatRejected.Build());
                 return;
@@ -295,7 +295,7 @@ namespace PrototonBot.Interactions
             await MongoHandler.UpdateUser(taggedUsr.Id, "PatsReceived", (taggedUsr.PatsReceived + 1));
 
             var PatSuccess = new EmbedBuilder();
-            PatSuccess.WithColor(0xB2A2F1);
+            PatSuccess.WithColor(0xFFAB59);
             PatSuccess.AddField("Pat Success!", $"<@{taggedUsr.Id}> has received a pat! <3\n{authorUsr.Name} also received 1 Pat Coin!");
             await RespondAsync("", embed: PatSuccess.Build());
         }
@@ -368,7 +368,7 @@ namespace PrototonBot.Interactions
             string userList = "";
             var totalUsers = MongoHandler.GetTotalUserCount().Result.Count();
             var _embed = new EmbedBuilder();
-            _embed.WithColor(0xB2A2F1);
+            _embed.WithColor(0xFFAB59);
 
             if (message == "money")
             {
@@ -539,7 +539,7 @@ namespace PrototonBot.Interactions
             {
                 var _embed = new EmbedBuilder();
                 _embed.WithTitle($"Which theme?");
-                _embed.WithColor(0xB2A2F1);
+                _embed.WithColor(0xFFAB59);
                 _embed.AddField("You Own", $"{String.Join(", ", mongoInv.OwnedThemes)}, and default.", true);
                 _embed.WithFooter("Missing themes? Buy them with /buy profiletheme!");
                 await RespondAsync("", embed: _embed.Build());
@@ -634,7 +634,7 @@ namespace PrototonBot.Interactions
             {
                 var _embed = new EmbedBuilder();
                 _embed.WithTitle($"Which badge?");
-                _embed.WithColor(0xB2A2F1);
+                _embed.WithColor(0xFFAB59);
                 _embed.AddField("You Own", $"{String.Join(", ", mongoInv.OwnedBadges)}.", true);
                 _embed.WithFooter("Missing badges? Buy them with /buy badge!");
                 await RespondAsync("", embed: _embed.Build());
