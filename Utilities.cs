@@ -67,7 +67,7 @@ namespace PrototonBot
         }
 
         // Handle checking if the user is ready to level up and inform them (depending on if it's enabled)
-        public static Task LevelUpdater(SocketUserMessage message)
+        public static async Task LevelUpdater(SocketUserMessage message)
         {
             var user = MongoHandler.GetUser(message.Author.Id.ToString()).Result;
             var server = MongoHandler.GetServer((message.Author as SocketGuildUser).Guild.Id.ToString()).Result;
@@ -76,13 +76,13 @@ namespace PrototonBot
             if (currentLevel != user.Level)
             {
                 // Reply with a level up message is the level has changed, and level up messages are enabled.
-                if (server.LevelUpMessages)
-                    message.ReplyAsync($":tada: **Congratulations, {message.Author.Username}, you've reached Level {currentLevel}!** :tada:");
+                if (server.LevelUpMessages && server.EnabledChannels.Contains(message.Channel.Id.ToString()))
+                    await message.Channel.SendMessageAsync($"**Congratulations {message.Author.Username}, you've reached Level {currentLevel}!** :tada:");
 
                 // Regardless of if a reply was sent, now update the user's level.
-                MongoHandler.UpdateUser(message.Author.Id.ToString(), "Level", currentLevel);
+                await MongoHandler.UpdateUser(message.Author.Id.ToString(), "Level", currentLevel);
             }
-            return Task.CompletedTask;
+            return;
         }
 
         // Handle checking if the user is ready to level up and inform them (depending on if it's enabled)
@@ -95,8 +95,8 @@ namespace PrototonBot
             if (currentLevel != user.Level)
             {
                 // Reply with a level up message is the level has changed, and level up messages are enabled.
-                if (server.LevelUpMessages)
-                    await interaction.Channel.SendMessageAsync($":tada: **Congratulations, {interaction.User.Username}, you've reached Level {currentLevel}!** :tada:");
+                if (server.LevelUpMessages && server.EnabledChannels.Contains(interaction.Channel.Id.ToString()))
+                    await interaction.Channel.SendMessageAsync($"**Congratulations {interaction.User.Username}, you've reached Level {currentLevel}!** :tada:");
 
                 // Regardless of if a reply was sent, now update the user's level.
                 await MongoHandler.UpdateUser(interaction.User.Id.ToString(), "Level", currentLevel);
