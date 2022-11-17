@@ -48,7 +48,8 @@ namespace PrototonBot.Interactions
             _embed.WithColor(0xFFAB59);
             _embed.WithDescription("Appeciated! All shares and invites of the bot are encouraged, as it helps the bot grow, and increases the network of users to think of possibilities, ideas, or help find bugs or problems.\nClick the blue hyperlink above to invite, or click the bot's profile.");
             _embed.WithThumbnailUrl(Context.Guild.GetUser(Context.Client.GetApplicationInfoAsync().Result.Id).GetAvatarUrl());
-            _embed.WithUrl($"https://discord.com/oauth2/authorize?client_id={Context.Client.GetApplicationInfoAsync().Result.Id}&scope=bot&permissions=3198016");
+            _embed.WithUrl($"https://discord.com/oauth2/authorize?client_id={Context.Client.GetApplicationInfoAsync().Result.Id}&scope=bot&permissions=536804191486");
+        
 
             await RespondAsync("", embed: _embed.Build());
         }
@@ -79,7 +80,7 @@ namespace PrototonBot.Interactions
             _embed.WithTitle("Welcome to PrototonBot!");
             _embed.WithThumbnailUrl(Context.Client.GetUser(Context.Client.GetApplicationInfoAsync().Result.Id).GetAvatarUrl());
             _embed.WithDescription($"PrototonBot is the successor to ShepherdBot Classic, a Discord Bot written for entertainment purposes with interactive commands. Mother language was JavaScript (Discord.js), later rewritten in C# (Discord.NET).\n\nIt is receiving occasional updates and cleanup. Features and ideas are brainstormed and only implemented when possible.");
-            _embed.AddField("Invite Bot", $"[Invite Link](https://discord.com/oauth2/authorize?client_id={Context.Client.GetApplicationInfoAsync().Result.Id}&scope=bot&permissions=3198016)", true);
+            _embed.AddField("Invite Bot", $"[Invite Link](https://discord.com/oauth2/authorize?client_id={Context.Client.GetApplicationInfoAsync().Result.Id}&scope=bot&permissions=536804191486)", true);
             _embed.AddField("Last Restart", $"{Program.LastRestartTime} {Program.TimeZone}", true);
             _embed.WithFooter($"{(gitValid ? "You can report bugs/issues to the GitHub Page's Issues Tab" : "")}\nBuilt with Visual Studio and Discord.NET");
 

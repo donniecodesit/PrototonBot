@@ -5,7 +5,7 @@
 
 # What is Prototon Bot?
 
-*Click [here](https://discord.com/oauth2/authorize?client_id=919110017142095914&permissions=8&scope=bot) to invite PrototonBot to your server. :)*
+*Click [here](https://discord.com/oauth2/authorize?client_id=919110017142095914&scope=bot&permissions=536804191486) to invite PrototonBot to your server. :)*
 
 *ProtogenBot's current icon was made via [Mod's Protogen Creator](https://picrew.me/image_maker/362292)*
 
