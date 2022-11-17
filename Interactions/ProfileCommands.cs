@@ -14,11 +14,20 @@ namespace PrototonBot.Interactions
         [SlashCommand("nickname", "[profile] Change your server nickname")]
         public async Task ChangeNick([Summary(description: "The nickname you'd like")] String nickname)
         {
+            var profaneWord = Utilities.profanityFilter(nickname);
+
             if (nickname.Length > 32)
             {
                 await RespondAsync("Nicknames must be 1 - 32 characters.");
                 return;
-            } else
+            } 
+
+            if (profaneWord != "")
+            {
+                await RespondAsync($"I spot some foul language: `{profaneWord}`", ephemeral: true);
+                return;
+            }
+            else
             {
                 try
                 {
@@ -161,6 +170,12 @@ namespace PrototonBot.Interactions
                 }
                 else
                 {
+                    var profaneWord = Utilities.profanityFilter(message);
+                    if (profaneWord != "")
+                    {
+                        await RespondAsync($"I spot some foul language: `{profaneWord}`", ephemeral: true);
+                        return;
+                    }
                     await MongoHandler.UpdateUser(mongoUsr.Id, "Description", message);
                     await RespondAsync($"Alright, done! Your description has been updated!\n> {message}");
                 }
