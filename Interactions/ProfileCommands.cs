@@ -10,6 +10,35 @@ namespace PrototonBot.Interactions
 {
     public class ProfileCommands : InteractionModuleBase<SocketInteractionContext>
     {
+        [RequireUserPermission(GuildPermission.ChangeNickname)]
+        [SlashCommand("nickname", "[profile] Change your server nickname")]
+        public async Task ChangeNick([Summary(description: "The nickname you'd like")] String nickname)
+        {
+            if (nickname.Length > 32)
+            {
+                await RespondAsync("Nicknames must be 1 - 32 characters.");
+                return;
+            } else
+            {
+                try
+                {
+                    await Context.Guild.GetUser(Context.Interaction.User.Id).ModifyAsync(user => user.Nickname = nickname);
+                    await RespondAsync($"Cool beans! Your nickname is now {nickname}!");
+                } catch (Exception err)
+                {
+                    Console.WriteLine(err);
+                    if (err.Message.Contains("Permissions"))
+                    {
+                        if (Context.Guild.Owner.Id == Context.Interaction.User.Id) await RespondAsync("Unable to change nickname, bot cannot modify properties of the guild owner.", ephemeral: true);
+                        else await RespondAsync("Unable to change nickname, bot is missing permissions or it's role in the hierarchy is below yours.", ephemeral: true);
+                    }
+                    else await RespondAsync($"Oops! A problem has occured.\n{err.Message}.", ephemeral: true);
+                }
+            }
+        }
+
+
+
         [SlashCommand("simpleprofile", "[profile] Display your profile in an embed")]
         public async Task SimpleProfile([Summary(description: "A tagged user (@)")] SocketUser user)
         {

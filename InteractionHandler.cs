@@ -43,9 +43,32 @@ namespace PrototonBot
             return Task.CompletedTask;
         }
 
-        private Task SlashCommandExecuted(SlashCommandInfo arg1, IInteractionContext arg2, IResult arg3)
+        private async Task SlashCommandExecuted(SlashCommandInfo arg1, IInteractionContext arg2, IResult arg3)
         {
-            return Task.CompletedTask;
+            if (!arg3.IsSuccess)
+            {
+                switch (arg3.Error)
+                {
+                    case InteractionCommandError.UnmetPrecondition:
+                        await arg2.Interaction.RespondAsync($"Unmet Precondition: {arg3.ErrorReason}", ephemeral: true);
+                        break;
+                    case InteractionCommandError.UnknownCommand:
+                        await arg2.Interaction.RespondAsync("Unknown command", ephemeral: true);
+                        break;
+                    case InteractionCommandError.BadArgs:
+                        await arg2.Interaction.RespondAsync("Invalid number or arguments", ephemeral: true);
+                        break;
+                    case InteractionCommandError.Exception:
+                        await arg2.Interaction.RespondAsync($"Command exception: {arg3.ErrorReason}", ephemeral: true);
+                        break;
+                    case InteractionCommandError.Unsuccessful:
+                        await arg2.Interaction.RespondAsync("Command could not be executed", ephemeral: true);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return;
         }
 
         private async Task HandleInteraction(SocketInteraction arg)
