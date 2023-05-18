@@ -820,7 +820,7 @@ namespace PrototonBot.Interactions
 
             textSettings.Height = 50;
             textSettings.FontPointsize = 40;
-            canvas.Composite(new MagickImage($"caption:{discordUser.Username}#{discordUser.Discriminator}", textSettings), 230, 20, CompositeOperator.Over);
+            canvas.Composite(new MagickImage($"caption:{discordUser.Username}", textSettings), 230, 20, CompositeOperator.Over);
 
             // LAYER 6: Level Area
             textSettings.Width = 123;
