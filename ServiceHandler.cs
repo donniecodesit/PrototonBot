@@ -80,10 +80,10 @@ namespace PrototonBot
         {
             var mongoSvr = MongoHandler.GetServer(guild.Id.ToString()).Result;
 
-            if (mongoSvr.WelcomeMessages && mongoSvr.WelcomeChannel != "")
+            if (mongoSvr.LeaveMessages && mongoSvr.LeaveChannel != "")
             {
-                var welcomeChannel = guild.GetTextChannel(Convert.ToUInt64(mongoSvr.WelcomeChannel));
-                await welcomeChannel.SendMessageAsync($"{user.Username} has departed from this server.. We wish them a friendly farewell! :broken_heart:");
+                var leaveChannel = guild.GetTextChannel(Convert.ToUInt64(mongoSvr.LeaveChannel));
+                await leaveChannel.SendMessageAsync($"{user.Username} has departed from this server.. We wish them a friendly farewell! :broken_heart:");
             }
 
             return;
