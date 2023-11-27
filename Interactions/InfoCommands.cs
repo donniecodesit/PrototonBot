@@ -49,7 +49,7 @@ namespace PrototonBot.Interactions
             _embed.WithDescription("Appeciated! All shares and invites of the bot are encouraged, as it helps the bot grow, and increases the network of users to think of possibilities, ideas, or help find bugs or problems.\nClick the blue hyperlink above to invite, or click the bot's profile.");
             _embed.WithThumbnailUrl(Context.Guild.GetUser(Context.Client.GetApplicationInfoAsync().Result.Id).GetAvatarUrl());
             _embed.WithUrl($"https://discord.com/oauth2/authorize?client_id={Context.Client.GetApplicationInfoAsync().Result.Id}&scope=bot&permissions=536804191486");
-        
+
 
             await RespondAsync("", embed: _embed.Build());
         }
@@ -63,7 +63,13 @@ namespace PrototonBot.Interactions
             _embed.WithColor(0xFFAB59);
             _embed.WithThumbnailUrl(guild.IconUrl);
             _embed.WithTitle($"{guild.Name} Information");
-            _embed.AddField("Server Information", $"Server ID: `{guild.Id}`\nCreated At: `{guild.CreatedAt}`\nOwner: `{guild.Owner}`\nMembers: `{guild.MemberCount}`\nRoles: `{guild.Roles.Count}`\nVerification Level: `{guild.VerificationLevel}`\n Level Messages: `{mongoSvr.LevelUpMessages}`\nServer Public: `{mongoSvr.Public} (TBD)`");
+            _embed.AddField("Server Information", $"" +
+                $"Server ID: `{guild.Id}`\n" +
+                $"Created At: `{guild.CreatedAt}`\n" +
+                $"Owner: <@{guild.Owner.Id}>\n" +
+                $"Members: `{guild.MemberCount}`\n" +
+                $"Roles: `{guild.Roles.Count}`\n"
+                );
 
             await RespondAsync("", embed: _embed.Build());
         }

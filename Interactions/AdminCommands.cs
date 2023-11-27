@@ -213,6 +213,31 @@ namespace PrototonBot.Interactions
             }
         }
 
+        [SlashCommand("serverinfo", "[admin] Display info & configuration for the current server")]
+        public async Task ServerInfo()
+        {
+            var mongoSvr = MongoHandler.GetServer(Context.Guild.Id.ToString()).Result;
+            var _embed = new EmbedBuilder();
+            var guild = Context.Guild;
+            _embed.WithColor(0xFFAB59);
+            _embed.WithThumbnailUrl(guild.IconUrl);
+            _embed.WithTitle($"{guild.Name}");
+            _embed.AddField("Server Information", $"" +
+                $"Server ID: `{guild.Id}`\n" +
+                $"Created At: `{guild.CreatedAt}`\n" +
+                $"Owner: <@{guild.Owner.Id}>\n" +
+                $"Members: `{guild.MemberCount}`\n" +
+                $"Roles: `{guild.Roles.Count}`\n" +
+                $"Verification Level: `{guild.VerificationLevel}`\n" +
+                $"Welcome Messages: `{mongoSvr.WelcomeMessages}`\n" +
+                $"Welcome Channel: {(mongoSvr.WelcomeChannel != "" ? $"<#{mongoSvr.WelcomeChannel}>" : "`None`")}\n" +
+                $"Leave Messages: `{mongoSvr.LeaveMessages}`\n" +
+                $"Leave Channel: {(mongoSvr.LeaveChannel != "" ? $"<#{mongoSvr.LeaveChannel}>" : "`None`")}\n"
+                );
+
+            await RespondAsync("", embed: _embed.Build());
+        }
+
         [SlashCommand("purge", "[admin] Delete a specific number of messages")]
         public async Task Purge([Summary(description: "The number of messages you wish to delete. Count if unsure. Cannot deleted older than 14 days.")] int amount)
         {
