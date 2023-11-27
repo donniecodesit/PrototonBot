@@ -165,7 +165,7 @@ namespace PrototonBot.MongoUtility
 
         public static Task CreateNewServer(IGuild guild)
         {
-            if (MongoHandler.GetServer(guild.Id.ToString()).Result != null) return Task.CompletedTask;
+            if (GetServer(guild.Id.ToString()).Result != null) return Task.CompletedTask;
             var data = new ServerObject();
             data.Id = guild.Id.ToString();
             data.Name = guild.Name.ToString();
@@ -174,7 +174,9 @@ namespace PrototonBot.MongoUtility
             data.EnabledChannels = new List<string>();
             data.LogChannel = "";
             data.WelcomeChannel = "";
+            data.LeaveChannel = "";
             data.WelcomeMessages = false;
+            data.LeaveMessages = false;
             serverCollection.InsertOne(data);
             return Task.CompletedTask;
         }
@@ -198,7 +200,7 @@ namespace PrototonBot.MongoUtility
 
         public static Task UpdateUser(string userId, string key, dynamic value)
         {
-            var userObj = MongoHandler.GetUser(userId);
+            var userObj = GetUser(userId);
             var filter = Builders<UserObject>.Filter.Eq("_id", userId);
             var update = Builders<UserObject>.Update.Set(key, value);
             userCollection.UpdateOne(filter, update);
@@ -207,7 +209,7 @@ namespace PrototonBot.MongoUtility
 
         public static Task UpdateInventory(string userId, string key, dynamic value)
         {
-            var inventoryObj = MongoHandler.GetInventory(userId);
+            var inventoryObj = GetInventory(userId);
             var filter = Builders<InventoryObject>.Filter.Eq("_id", userId);
             var update = Builders<InventoryObject>.Update.Set(key, value);
             userInvCollection.UpdateOne(filter, update);
@@ -216,7 +218,7 @@ namespace PrototonBot.MongoUtility
 
         public static Task UpdateServer(string serverId, string key, dynamic value)
         {
-            var serverObj = MongoHandler.GetServer(serverId);
+            var serverObj = GetServer(serverId);
             var filter = Builders<ServerObject>.Filter.Eq("_id", serverId);
             var update = Builders<ServerObject>.Update.Set(key, value);
             serverCollection.UpdateOne(filter, update);

@@ -43,7 +43,9 @@ namespace PrototonBot.MongoUtility
         public string LogChannel { get; set; }
         public List<string> EnabledChannels { get; set; }
         public string WelcomeChannel { get; set; }
+        public string LeaveChannel { get; set; }
         public bool WelcomeMessages { get; set; }
+        public bool LeaveMessages { get; set; }
     }
 
     public class InventoryObject
