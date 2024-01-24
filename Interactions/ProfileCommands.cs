@@ -753,16 +753,16 @@ namespace PrototonBot.Interactions
                 Font = Path.Combine("Storage", "BarlowCondensed-Regular.ttf"),
                 FontStyle = FontStyleType.Normal,
                 TextGravity = Gravity.Center,
-                Width = 1000,
-                Height = 600,
-                TextInterwordSpacing = 8D
+                Width = 500,
+                Height = 300,
+                TextInterwordSpacing = 4D
             };
 
             // Fetch the user's profile photo.
             var discordUser = Context.Client.GetUserAsync(Convert.ToUInt64(user.Id)).Result;
             webClient.DownloadFile($"https://cdn.discordapp.com/avatars/{discordUser.Id}/{discordUser.AvatarId}.png?size=512", Path.Combine(Program.CacheDir, $"{user.Id}.png"));
             var userPhoto = new MagickImage(Path.Combine(Program.CacheDir, $"{user.Id}.png"), ImageReadSettings);
-            userPhoto.Resize(212, 212);
+            userPhoto.Resize(106, 106);
 
             // LAYER 1: Background
             var canvas = mongoInv.PickedTheme switch
@@ -801,65 +801,65 @@ namespace PrototonBot.Interactions
             };
 
             experienceBar.Crop((int)(experienceBar.Width * expPercent), experienceBar.Height);
-            canvas.Composite(experienceBar, 143, 244, CompositeOperator.Over);
+            canvas.Composite(experienceBar, 71, 121, CompositeOperator.Over);
 
             // LAYER 3: User Icon
             userPhoto.Composite(ProfileMask, CompositeOperator.CopyAlpha);
             if (Program.DeveloperIDs.Contains(user.Id.ToString())) userPhoto.Composite(DeveloperOverlay, CompositeOperator.Over);
-            canvas.Composite(userPhoto, 20, 20, CompositeOperator.Over);
+            canvas.Composite(userPhoto, 10, 10, CompositeOperator.Over);
 
             // LAYER 4: Developer Tip & Badges
             // See above ToDo
 
             // LAYER 5: Username and Description
-            textSettings.Width = 750;
-            textSettings.Height = 110;
+            textSettings.Width = 375;
+            textSettings.Height = 55;
             textSettings.TextGravity = Gravity.Center;
-            textSettings.FontPointsize = (mongoUsr.Description.Length < 121) ? 36 : 20;
-            canvas.Composite(new MagickImage($"caption:{mongoUsr.Description}", textSettings), 230, 70, CompositeOperator.Over);
+            textSettings.FontPointsize = (mongoUsr.Description.Length < 121) ? 18 : 10;
+            canvas.Composite(new MagickImage($"caption:{mongoUsr.Description}", textSettings), 115, 35, CompositeOperator.Over);
 
-            textSettings.Height = 50;
-            textSettings.FontPointsize = 40;
-            canvas.Composite(new MagickImage($"caption:{discordUser.Username}", textSettings), 230, 20, CompositeOperator.Over);
+            textSettings.Height = 25;
+            textSettings.FontPointsize = 20;
+            canvas.Composite(new MagickImage($"caption:{discordUser.Username}", textSettings), 115, 10, CompositeOperator.Over);
 
             // LAYER 6: Level Area
-            textSettings.Width = 123;
-            textSettings.Height = 47;
-            textSettings.FontPointsize = 32;
+            textSettings.Width = 61;
+            textSettings.Height = 23;
+            textSettings.FontPointsize = 16;
             textSettings.TextGravity = Gravity.South;
-            canvas.Composite(new MagickImage($"caption:Level {mongoUsr.Level}", textSettings), 10, 244, CompositeOperator.Over);
+            canvas.Composite(new MagickImage($"caption:Level {mongoUsr.Level}", textSettings), 5, 122, CompositeOperator.Over);
 
             // LAYER 7: Experience Area
-            textSettings.Width = 240;
-            textSettings.Height = 26;
-            textSettings.FontPointsize = 26;
+            textSettings.Width = 120;
+            textSettings.Height = 13;
+            textSettings.FontPointsize = 13;
             textSettings.TextGravity = Gravity.East;
-            canvas.Composite(new MagickImage($"caption:{(long)expToNext} XP to {mongoUsr.Level + 1}", textSettings), 741, 265, CompositeOperator.Over);
+            canvas.Composite(new MagickImage($"caption:{(long)expToNext} XP to {mongoUsr.Level + 1}", textSettings), 370, 132, CompositeOperator.Over);
 
             // LAYER 8: Value Entries
             // Adjust text for left side entries.
             textSettings.TextGravity = Gravity.West;
-            textSettings.Width = 450;
-            textSettings.Height = 275;
-            textSettings.FontPointsize = 26;
-            textSettings.TextInterlineSpacing = 8;
+            textSettings.Width = 225;
+            textSettings.Height = 137;
+            textSettings.FontPointsize = 13;
+            textSettings.TextInterlineSpacing = 4;
 
             var leftEntries = $"caption:Protobucks: {mongoUsr.Money}\nPats Received: {mongoUsr.PatsReceived}\nDaily Streak of {mongoUsr.DailyStreak}\nDaily Bonus of +{mongoUsr.DailyBonus}\nPurchases Made: {mongoUsr.Purchases}\nPartnered with {(mongoUsr.Partner != "None" ? MongoHandler.GetUser(mongoUsr.Partner).Result.Name : "Nobody")}\n{(mongoUsr.Mutuals ? "Mutual Partner!" : "")}";
-            canvas.Composite(new MagickImage(leftEntries, textSettings), 20, 305, CompositeOperator.Over);
+            canvas.Composite(new MagickImage(leftEntries, textSettings), 10, 152, CompositeOperator.Over);
 
             // Adjust text for right side entries.
             textSettings.TextGravity = Gravity.East;
 
             var rightEntries = $"caption:Luck Level: {mongoUsr.Luck}\nGambled {mongoUsr.Gambles} times\n{mongoUsr.GamblesWon} Wins (Total Won: {mongoUsr.GamblesNetGain})\n{mongoUsr.GamblesLost} Losses (Total Lost: {mongoUsr.GamblesNetLoss})\nReceived {mongoUsr.TransferIn} Protobucks\nGiven/Sent {mongoUsr.TransferOut} Protobucks\nCurrent XP + Money Multiplier: {Math.Round((1 * (mongoUsr.Mutuals ? 1.05 : 1) * (mongoUsr.Boosted ? 1.05 : 1)) * 100)}%";
-            canvas.Composite(new MagickImage(rightEntries, textSettings), 530, 305, CompositeOperator.Over);
+            canvas.Composite(new MagickImage(rightEntries, textSettings), 265, 152, CompositeOperator.Over);
 
             // Adjust text for middle entries.
             textSettings.TextGravity = Gravity.Center;
-            textSettings.Width = 240;
+            textSettings.Width = 120;
             var toolsOwned = mongoInv.Axes + mongoInv.Picks + mongoInv.Wrenches;
             var materialsOwned = mongoInv.Paperclips + mongoInv.Diamonds + mongoInv.Bolts + mongoInv.Logs + mongoInv.Bulbs + mongoInv.Bricks + mongoInv.Gears + mongoInv.Leaves + mongoInv.CDs;
             var middleEntries = $"caption:Daily Coins: {mongoInv.DailyCoins} / {mongoInv.DailyCoinsTotal}\nPat Coins: {mongoInv.PatCoins} / {mongoInv.PatCoinsTotal}\nGamble Coins: {mongoInv.GambleCoins} / {mongoInv.GambleCoinsTotal}\n{mongoInv.OwnedThemes.Count() + 1} Themes Owned\n{mongoInv.OwnedBadges.Count()} Badges Owned\n{toolsOwned} Tools Owned\n{materialsOwned} Materials Owned";
-            canvas.Composite(new MagickImage(middleEntries, textSettings), 380, 305, CompositeOperator.Over);
+            canvas.Composite(new MagickImage(middleEntries, textSettings), 190, 152, CompositeOperator.Over);
 
             // LAYER 9: Badges
             for (var index = 0; index < 9; index++)
@@ -878,8 +878,8 @@ namespace PrototonBot.Interactions
                         "abroflag" => AbroFlag.Clone(),
                         "heteroflag" => HeteroFlag.Clone()
                     };
-                    var badgeXPos = 332 + index * 60;
-                    canvas.Composite(badgeToDisplay, badgeXPos, 180, CompositeOperator.Over);
+                    var badgeXPos = 166 + index * 30;
+                    canvas.Composite(badgeToDisplay, badgeXPos, 90, CompositeOperator.Over);
                 }
             }
 
