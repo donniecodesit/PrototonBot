@@ -97,6 +97,8 @@ namespace PrototonBot.Interactions
             [Choice("Welcome Messages", "welcomemsgs")]
             [Choice("Leave Messages", "leavemsgs")]
             [Choice("Level Messages", "levelmsgs")]
+            [Choice("Log Deleted Messages", "logdeletes")]
+            [Choice("Log Edited Messages", "logupdates")]
             [Choice("Global Visibility", "public")] string action,
             [Summary(description: "True to enable, False to disable.")] bool enabled)
         {
@@ -153,6 +155,58 @@ namespace PrototonBot.Interactions
                         {
                             await MongoHandler.UpdateServer(Context.Guild.Id.ToString(), "LeaveMessages", false);
                             await RespondAsync($":white_check_mark: Leave messages are now disabled for {Context.Guild.Name}!");
+                        }
+                    }
+                    break;
+                case "logdeletes":
+                    if (enabled)
+                    {
+                        if (mongoSvr.LogDeletedMessages)
+                        {
+                            await RespondAsync($":information_source: Deleted message logs are already enabled for {Context.Guild.Name}.");
+                        }
+                        else
+                        {
+                            await MongoHandler.UpdateServer(Context.Guild.Id.ToString(), "LogDeletedMessages", true);
+                            await RespondAsync($":white_check_mark: Deleted message logs are now enabled for {Context.Guild.Name}!");
+                        }
+                    }
+                    else
+                    {
+                        if (!mongoSvr.LogDeletedMessages)
+                        {
+                            await RespondAsync($":information_source: Deleted message logs are already disabled for {Context.Guild.Name}.");
+                        }
+                        else
+                        {
+                            await MongoHandler.UpdateServer(Context.Guild.Id.ToString(), "LogDeletedMessages", false);
+                            await RespondAsync($":white_check_mark: Deleted message logs are now disabled for {Context.Guild.Name}!");
+                        }
+                    }
+                    break;
+                case "logupdates":
+                    if (enabled)
+                    {
+                        if (mongoSvr.LogUpdatedMessages)
+                        {
+                            await RespondAsync($":information_source: Edited message logs are already enabled for {Context.Guild.Name}.");
+                        }
+                        else
+                        {
+                            await MongoHandler.UpdateServer(Context.Guild.Id.ToString(), "LogUpdatedMessages", true);
+                            await RespondAsync($":white_check_mark: Edited message logs are now enabled for {Context.Guild.Name}!");
+                        }
+                    }
+                    else
+                    {
+                        if (!mongoSvr.LogUpdatedMessages)
+                        {
+                            await RespondAsync($":information_source: Edited message logs are already disabled for {Context.Guild.Name}.");
+                        }
+                        else
+                        {
+                            await MongoHandler.UpdateServer(Context.Guild.Id.ToString(), "LogUpdatedMessages", false);
+                            await RespondAsync($":white_check_mark: Edited message logs are now disabled for {Context.Guild.Name}!");
                         }
                     }
                     break;
@@ -229,10 +283,13 @@ namespace PrototonBot.Interactions
                 $"Members: `{guild.MemberCount}`\n" +
                 $"Roles: `{guild.Roles.Count}`\n" +
                 $"Verification Level: `{guild.VerificationLevel}`\n" +
-                $"Welcome Messages: `{mongoSvr.WelcomeMessages}`\n" +
                 $"Welcome Channel: {(mongoSvr.WelcomeChannel != "" ? $"<#{mongoSvr.WelcomeChannel}>" : "`None`")}\n" +
+                $"Leave Channel: {(mongoSvr.LeaveChannel != "" ? $"<#{mongoSvr.LeaveChannel}>" : "`None`")}\n" +
+                $"Log Channel: {(mongoSvr.LogChannel != "" ? $"<#{mongoSvr.LogChannel}>" : "`None`")}\n" +
+                $"Welcome Messages: `{mongoSvr.WelcomeMessages}`\n" +
                 $"Leave Messages: `{mongoSvr.LeaveMessages}`\n" +
-                $"Leave Channel: {(mongoSvr.LeaveChannel != "" ? $"<#{mongoSvr.LeaveChannel}>" : "`None`")}\n"
+                $"Log Deleted Messages: `{mongoSvr.LogDeletedMessages}`\n" +
+                $"Log Edited Messages: `{mongoSvr.LogUpdatedMessages}`\n" 
                 );
 
             await RespondAsync("", embed: _embed.Build());

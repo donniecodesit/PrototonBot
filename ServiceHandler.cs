@@ -27,6 +27,8 @@ namespace PrototonBot
             _client.JoinedGuild += OnNewGuild;
             _client.LeftGuild += OnLeaveGuild;
             _client.ChannelDestroyed += OnChannelDeleted;
+            _client.MessageDeleted += OnMessageDeleted;
+            _client.MessageUpdated += OnMessageUpdated;
             return Task.CompletedTask;
         }
 
@@ -104,7 +106,7 @@ namespace PrototonBot
 
         private async Task OnChannelDeleted(SocketChannel channel)
         {
-            var server = MongoHandler.GetServer((channel as SocketGuildChannel).Guild.Id.ToString()).Result;
+            var server = MongoHandler.GetServer(((SocketGuildChannel)channel).Guild.Id.ToString()).Result;
 
             if (server.WelcomeChannel == channel.Id.ToString())
             {
@@ -119,6 +121,63 @@ namespace PrototonBot
                 var currentlyEnabled = server.EnabledChannels;
                 currentlyEnabled.Remove(channel.Id.ToString());
                 await MongoHandler.UpdateServer(server.Id.ToString(), "EnabledChannels", currentlyEnabled);
+            }
+
+            return;
+        }
+
+        private async Task OnMessageDeleted(Cacheable<IMessage, ulong> cachedMsg, Cacheable<IMessageChannel, ulong> cachedChannel)
+        {
+            IMessage message = await cachedMsg.GetOrDownloadAsync();
+            if (message == null) return;
+            if (message.Content == null || message.Content == "" || message.Author.IsBot) return;
+
+            SocketGuildChannel channel = (SocketGuildChannel)_client.GetChannel(cachedChannel.Id);
+            SocketGuild guild = channel.Guild;
+            SocketUser user = (SocketUser) message.Author;
+            var mongoSvr = MongoHandler.GetServer(guild.Id.ToString()).Result;
+
+            if (mongoSvr.LogDeletedMessages && mongoSvr.LogChannel != "")
+            {
+                var messageTrimmed = message.Content.Length <= 700 ? message.Content : (message.Content.Substring(0, 700) + "...");
+
+                var deletedLogsChannel = guild.GetTextChannel(Convert.ToUInt64(mongoSvr.LogChannel));
+                var _embed = new EmbedBuilder();
+                _embed.WithColor(0xFFAB59);
+                _embed.WithDescription($"**Message from <@{user.Id}> was deleted in <#{channel.Id}>:**\n{messageTrimmed}");
+                _embed.WithAuthor("Deleted Message", user.GetAvatarUrl());
+                await deletedLogsChannel.SendMessageAsync("", embed: _embed.Build());
+            }
+
+            return;
+        }
+
+        private async Task OnMessageUpdated(Cacheable<IMessage, ulong> cachedMsg, SocketMessage newMessage, ISocketMessageChannel channelSource)
+        {
+            IMessage originalMsg = await cachedMsg.GetOrDownloadAsync();
+            if (originalMsg.Author.IsBot) return;
+
+            SocketGuildChannel channel = (SocketGuildChannel)_client.GetChannel(channelSource.Id);
+            SocketGuild guild = channel.Guild;
+            var mongoSvr = MongoHandler.GetServer(guild.Id.ToString()).Result;
+
+            if (mongoSvr.LogUpdatedMessages && mongoSvr.LogChannel != "")
+            {
+                var oldMsgTrimmed = "*(no message)*";
+                var newMsgTrimmed = "*(no message)*";
+
+                if (originalMsg.Content != null && originalMsg.Content.Length != 0)
+                    oldMsgTrimmed = originalMsg.Content.Length <= 700 ? originalMsg.Content : (originalMsg.Content.Substring(0, 700) + "...");
+
+                if (newMessage.Content != null && newMessage.Content.Length != 0)
+                    newMsgTrimmed = newMessage.Content.Length <= 700 ? newMessage.Content : (newMessage.Content.Substring(0, 700) + "...");
+
+                var deletedLogsChannel = guild.GetTextChannel(Convert.ToUInt64(mongoSvr.LogChannel));
+                var _embed = new EmbedBuilder();
+                _embed.WithColor(0xFFAB59);
+                _embed.WithDescription($"**<@{newMessage.Author.Id}> edited a message in <#{channel.Id}>:**\n{oldMsgTrimmed}\n🔻\n{newMsgTrimmed}");
+                _embed.WithAuthor("Edited Message", newMessage.Author.GetAvatarUrl());
+                await deletedLogsChannel.SendMessageAsync("", embed: _embed.Build());
             }
 
             return;

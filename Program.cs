@@ -49,10 +49,12 @@ namespace PrototonBot
                           | GatewayIntents.GuildMessageTyping
                           | GatewayIntents.Guilds
                           | GatewayIntents.GuildVoiceStates
-                          | GatewayIntents.GuildWebhooks,
+                          | GatewayIntents.GuildWebhooks
+                          | GatewayIntents.MessageContent,
                         LogGatewayIntentWarnings = false,
                         AlwaysDownloadUsers = true,
-                        LogLevel = LogSeverity.Debug
+                        LogLevel = LogSeverity.Debug,
+                        MessageCacheSize = 2048,
                     }))
                     // Adding Logging to Console
                     .AddTransient<ConsoleLogger>()
