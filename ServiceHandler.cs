@@ -155,7 +155,8 @@ namespace PrototonBot
         private async Task OnMessageUpdated(Cacheable<IMessage, ulong> cachedMsg, SocketMessage newMessage, ISocketMessageChannel channelSource)
         {
             IMessage originalMsg = await cachedMsg.GetOrDownloadAsync();
-            if (originalMsg.Author.IsBot) return;
+            if (originalMsg.Author.IsBot || originalMsg.Content == newMessage.Content) return;
+
 
             SocketGuildChannel channel = (SocketGuildChannel)_client.GetChannel(channelSource.Id);
             SocketGuild guild = channel.Guild;
