@@ -37,7 +37,7 @@ namespace PrototonBot.Interactions
         [SlashCommand("noticeme", "[fun] Be noticed by PrototonBot")]
         public async Task NoticeMeCommand()
         {
-            await RespondAsync($"Awe, no worries <@{Context.User.Id}>. PrototonBot notices you!\nHave some good ol' lovin'! :heart::hugging::heart::hugging:");
+            await RespondAsync($"Awe, no worries {Context.User.Mention}. PrototonBot notices you!\nHave some good ol' lovin'! :heart::hugging::heart::hugging:");
         }
 
         [SlashCommand("botinvite", "[info] Receive an invite for the bot")]
@@ -66,7 +66,7 @@ namespace PrototonBot.Interactions
             _embed.AddField("Server Information", $"" +
                 $"Server ID: `{guild.Id}`\n" +
                 $"Created At: `{guild.CreatedAt}`\n" +
-                $"Owner: <@{guild.Owner.Id}>\n" +
+                $"Owner: {guild.Owner.Mention}\n" +
                 $"Members: `{guild.MemberCount}`\n" +
                 $"Roles: `{guild.Roles.Count}`\n"
                 );

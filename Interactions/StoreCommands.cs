@@ -144,7 +144,7 @@ namespace PrototonBot.Interactions
                 _embed.WithColor(0xFFAB59);
                 _embed.WithTitle("PrototonBot Upgrade Shop");
                 _embed.WithThumbnailUrl(Context.Client.GetUser(Context.Client.GetApplicationInfoAsync().Result.Id).GetAvatarUrl());
-                _embed.WithDescription($"Hey! Welcome to the super magic Upgrade Shop! We take those amazing coins you've earned from using our services and infuse them with your profile to give you better statistics all around! Currently, we provide 2 stats. <@{mongoUsr.Id}>");
+                _embed.WithDescription($"Hey! Welcome to the super magic Upgrade Shop! We take those amazing coins you've earned from using our services and infuse them with your profile to give you better statistics all around! Currently, we provide 2 stats. {Context.User.Mention}");
                 _embed.AddField($"``/upgrade luck`` (Your stat: {mongoUsr.Luck})", $"Costs: 14 Daily Coins, 14 Pat Coins, 50 Gamble Coins.\nRaises your Luck by 1, increasing your probability at gambling. Maximum of 25.");
                 _embed.AddField($"``/upgrade dailybonus`` (Your stat: {mongoUsr.DailyBonus})", $"Costs: 14 Daily Coins.\nRaises your Daily earnings by 100.");
                 _embed.AddField("Your Coins", $"DC: {mongoInv.DailyCoins} | PC: {mongoInv.PatCoins} | GC: {mongoInv.GambleCoins}");

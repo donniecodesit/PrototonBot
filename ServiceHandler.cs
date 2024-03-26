@@ -72,7 +72,14 @@ namespace PrototonBot
             if (mongoSvr.WelcomeMessages && mongoSvr.WelcomeChannel != "")
             {
                 var welcomeChannel = user.Guild.GetTextChannel(Convert.ToUInt64(mongoSvr.WelcomeChannel));
-                await welcomeChannel.SendMessageAsync($":sparkling_heart: Welcome <@{user.Id}>, to **{mongoSvr.Name}**! Have a wonderful time here! :sparkling_heart:");
+                var welcomeMessage = $"{mongoSvr.WelcomeMessageString}";
+                var editedMessage = welcomeMessage
+                    .Replace("<user.name>", $"{user.DisplayName ?? user.Username}")
+                    .Replace("<user.mention>", $"{user.Mention}")
+                    .Replace("<server.name>", $"{user.Guild.Name}")
+                    .Replace("<server.members>", $"{user.Guild.MemberCount}");
+
+                await welcomeChannel.SendMessageAsync($"{editedMessage}");
             }
 
             return;
@@ -85,7 +92,14 @@ namespace PrototonBot
             if (mongoSvr.LeaveMessages && mongoSvr.LeaveChannel != "")
             {
                 var leaveChannel = guild.GetTextChannel(Convert.ToUInt64(mongoSvr.LeaveChannel));
-                await leaveChannel.SendMessageAsync($"{user.Username} has departed from this server.. We wish them a friendly farewell! :broken_heart:");
+                var leaveMessage = $"{mongoSvr.LeaveMessageString}";
+                var editedMessage = leaveMessage
+                    .Replace("<user.name>", $"{user.Username}")
+                    .Replace("<user.mention>", $"{user.Mention}")
+                    .Replace("<server.name>", $"{guild.Name}")
+                    .Replace("<server.members>", $"{guild.MemberCount}");
+
+                await leaveChannel.SendMessageAsync($"{editedMessage}");
             }
 
             return;
@@ -134,18 +148,18 @@ namespace PrototonBot
 
             SocketGuildChannel channel = (SocketGuildChannel)_client.GetChannel(cachedChannel.Id);
             SocketGuild guild = channel.Guild;
-            SocketUser user = (SocketUser) message.Author;
+            SocketUser user = (SocketUser)message.Author;
             var mongoSvr = MongoHandler.GetServer(guild.Id.ToString()).Result;
 
             if (mongoSvr.LogDeletedMessages && mongoSvr.LogChannel != "")
             {
-                var messageTrimmed = message.Content.Length <= 700 ? message.Content : (message.Content.Substring(0, 700) + "...");
+                var messageTrimmed = message.Content.Length <= 600 ? message.Content : (message.Content.Substring(0, 600) + "...");
 
                 var deletedLogsChannel = guild.GetTextChannel(Convert.ToUInt64(mongoSvr.LogChannel));
                 var _embed = new EmbedBuilder();
                 _embed.WithColor(0xFFAB59);
-                _embed.WithDescription($"**Message from <@{user.Id}> was deleted in <#{channel.Id}>:**\n{messageTrimmed}");
-                _embed.WithAuthor("Deleted Message", user.GetAvatarUrl());
+                _embed.WithDescription($"{messageTrimmed}");
+                _embed.WithAuthor($"Message from {user.GlobalName ?? user.Username} deleted in #{channel.Name}:", user.GetAvatarUrl());
                 await deletedLogsChannel.SendMessageAsync("", embed: _embed.Build());
             }
 
@@ -168,16 +182,16 @@ namespace PrototonBot
                 var newMsgTrimmed = "*(no message)*";
 
                 if (originalMsg.Content != null && originalMsg.Content.Length != 0)
-                    oldMsgTrimmed = originalMsg.Content.Length <= 700 ? originalMsg.Content : (originalMsg.Content.Substring(0, 700) + "...");
+                    oldMsgTrimmed = originalMsg.Content.Length <= 600 ? originalMsg.Content : (originalMsg.Content.Substring(0, 600) + "...");
 
                 if (newMessage.Content != null && newMessage.Content.Length != 0)
-                    newMsgTrimmed = newMessage.Content.Length <= 700 ? newMessage.Content : (newMessage.Content.Substring(0, 700) + "...");
+                    newMsgTrimmed = newMessage.Content.Length <= 600 ? newMessage.Content : (newMessage.Content.Substring(0, 600) + "...");
 
                 var deletedLogsChannel = guild.GetTextChannel(Convert.ToUInt64(mongoSvr.LogChannel));
                 var _embed = new EmbedBuilder();
                 _embed.WithColor(0xFFAB59);
-                _embed.WithDescription($"**<@{newMessage.Author.Id}> edited a message in <#{channel.Id}>:**\n{oldMsgTrimmed}\n🔻\n{newMsgTrimmed}");
-                _embed.WithAuthor("Edited Message", newMessage.Author.GetAvatarUrl());
+                _embed.WithDescription($"{oldMsgTrimmed}\n↘ ↘ ↘\n{newMsgTrimmed}");
+                _embed.WithAuthor($"{originalMsg.Author.GlobalName ?? originalMsg.Author.Username} edited a message in #{channel.Name}:", newMessage.Author.GetAvatarUrl());
                 await deletedLogsChannel.SendMessageAsync("", embed: _embed.Build());
             }
 

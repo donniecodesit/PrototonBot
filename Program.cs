@@ -22,6 +22,8 @@ namespace PrototonBot
         public static string? ApplicationID;
         public static string? CacheDir;
         public static List<string>? ActiveRedeemCodes;
+        public static string DefaultMessageWelcomes;
+        public static string DefaultMessageLeaves;
 
         public static Task Main() => new Program().MainAsync();
 
@@ -54,7 +56,7 @@ namespace PrototonBot
                         LogGatewayIntentWarnings = false,
                         AlwaysDownloadUsers = true,
                         LogLevel = LogSeverity.Debug,
-                        MessageCacheSize = 2048,
+                        MessageCacheSize = 700,
                     }))
                     // Adding Logging to Console
                     .AddTransient<ConsoleLogger>()
@@ -130,6 +132,8 @@ namespace PrototonBot
             CacheDir = config["CacheDir"];
             ApplicationID = config["ApplicationID"];
             ActiveRedeemCodes = config.GetSection("ActiveRedeemCodes").Get<string[]>().ToList();
+            DefaultMessageWelcomes = config["DefaultMessageWelcomes"];
+            DefaultMessageLeaves = config["DefaultMessageLeaves"];
 
             await Task.Delay(-1);
         }

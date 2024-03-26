@@ -1,4 +1,5 @@
 ﻿using Discord.Interactions;
+using MongoDB.Bson;
 using PrototonBot.MongoUtility;
 
 namespace PrototonBot.Interactions
@@ -65,7 +66,7 @@ namespace PrototonBot.Interactions
                     await MongoHandler.UpdateUser(user.Id, "GamblesNetGain", ((user.GamblesNetGain - bet) + bet3));
                     await MongoHandler.UpdateUser(user.Id, "Money", ((user.Money - bet) + bet3));
                     await MongoHandler.UpdateUser(user.Id, "EXP", (Math.Floor(user.EXP + (30 * userXPMultiplier))));
-                    await RespondAsync($"Wow, you did great at the casino!\nYou bet {bet} Protobacks and made a profit of {bet3 - bet} Protobucks!\nYou also received 2 Gamble Coins!");
+                    await RespondAsync($"{Context.User.Mention}, you were fantastic at the casino!\nYou bet {bet} Protobacks and made a profit of {bet3 - bet} Protobucks!\nYou received 2 Gamble Coins!");
                 }
                 else if (gambleChance >= 13 && gambleChance <= 37)
                 {
@@ -75,19 +76,19 @@ namespace PrototonBot.Interactions
                     await MongoHandler.UpdateUser(user.Id, "GamblesNetGain", ((user.GamblesNetGain - bet) + bet2));
                     await MongoHandler.UpdateUser(user.Id, "Money", ((user.Money - bet) + bet2));
                     await MongoHandler.UpdateUser(user.Id, "EXP", (Math.Floor(user.EXP + (20 * userXPMultiplier))));
-                    await RespondAsync($"You seem to have done well at the casino.\nYou bet {bet} Protobucks and made a profit of {bet2 - bet} Protobucks!\nYou also received a Gamble Coin!");
+                    await RespondAsync($"{Context.User.Mention}, you did well at the casino!\nYou bet {bet} Protobucks and made a profit of {bet2 - bet} Protobucks!\nYou received a Gamble Coin!");
                 }
                 else if (gambleChance >= 38 && gambleChance <= 66)
                 {
                     await MongoHandler.UpdateUser(user.Id, "EXP", (Math.Floor(user.EXP + (10 * userXPMultiplier))));
-                    await RespondAsync($"<@{user.Id}>, although you had a bit of fun at the casino, you left keeping your {bet} Protobucks.");
+                    await RespondAsync($"{Context.User.Mention}, although you had a fun time at the casino, you left keeping your {bet} Protobucks.");
                 }
                 else if (gambleChance >= 67)
                 {
                     await MongoHandler.UpdateUser(user.Id, "GamblesLost", (user.GamblesLost + 1));
                     await MongoHandler.UpdateUser(user.Id, "GamblesNetLoss", (user.GamblesNetLoss - bet));
                     await MongoHandler.UpdateUser(user.Id, "Money", (user.Money - bet));
-                    await RespondAsync($"Awe gee, no.. I'm so sorry, but the casino has beaten you!\nYou've lost your {bet} Protobucks!");
+                    await RespondAsync($"{Context.User.Mention}, I'm so very sorry, but the casino has beaten you!\nYou've lost your {bet} Protobucks!");
                 }
                 return;
             }
@@ -102,13 +103,13 @@ namespace PrototonBot.Interactions
             var failedChop = RNG.Next(0, 101) <= 20 ? true : false;
             var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-            if (inv.Axes == 0) { await RespondAsync($"Sorry <@{user.Id}>, but you don't have any axes! Get one from the store!"); return; }
+            if (inv.Axes == 0) { await RespondAsync($"Sorry {Context.User.Mention}, but you don't have any axes! Get one from the store!"); return; }
             if (inv.LastChop > (currentTime - 180))
             {
                 long secsRemaining = ((inv.LastChop + 180) - currentTime);
                 var spanOfTime = TimeSpan.FromSeconds(secsRemaining);
                 string str = spanOfTime.Minutes + " minute(s) and " + spanOfTime.Seconds + " second(s)";
-                await RespondAsync($"Hey hey, take a quick break! Chopping trees takes a lot of stamina!\nTry again in {str}, <@{user.Id}>.");
+                await RespondAsync($"Hey hey, take a quick break! Chopping trees takes a lot of stamina!\nTry again in {str}, {Context.User.Mention}.");
                 return;
             }
 
@@ -117,20 +118,20 @@ namespace PrototonBot.Interactions
                 //If you have 2 axes uses, take 1 use
                 if (inv.AxeUses >= 2)
                 {
-                    await RespondAsync($"You chopped and you chopped all day, but that bark was just too tough, <@{user.Id}>.");
+                    await RespondAsync($"You chopped and you chopped all day, but that bark was just too tough, {Context.User.Mention}.");
                     await MongoHandler.UpdateInventory(user.Id, "AxeUses", (inv.AxeUses - 1));
                 }
                 //If you have 1 axe with 1 use left, take 1 use and the axe
                 else if (inv.AxeUses == 1 && inv.Axes == 1)
                 {
-                    await RespondAsync($"You chopped at that tree all day until your only axe ended up breaking! Oh no, <@{user.Id}>.");
+                    await RespondAsync($"You chopped at that tree all day until your only axe ended up breaking! Oh no, {Context.User.Mention}.");
                     await MongoHandler.UpdateInventory(user.Id, "AxeUses", (inv.AxeUses - 1));
                     await MongoHandler.UpdateInventory(user.Id, "Axes", (inv.Axes - 1));
                 }
                 //If you have 2+ axes, but 1 use left, reset uses and take 1 axe
                 else if (inv.AxeUses == 1 && inv.Axes >= 2)
                 {
-                    await RespondAsync($"You chopped at that tree all day until one of your axes ended up breaking! Oh no, <@{user.Id}>.");
+                    await RespondAsync($"You chopped at that tree all day until one of your axes ended up breaking! Oh no, {Context.User.Mention}.");
                     await MongoHandler.UpdateInventory(user.Id, "AxeUses", 10);
                     await MongoHandler.UpdateInventory(user.Id, "Axes", (inv.Axes - 1));
                 }
@@ -144,34 +145,34 @@ namespace PrototonBot.Interactions
                 var LeavesGet = RNG.Next(1, 20);
                 if (inv.AxeUses == 10)
                 {
-                    await RespondAsync($"<@{user.Id}> hacked away with their brand new axe and chopped down a tree!\nThey got {LogsGet} :evergreen_tree: and {LeavesGet} :fallen_leaf:!");
+                    await RespondAsync($"{Context.User.Mention} hacked away with their brand new axe and chopped down a tree!\nThey got {LogsGet} :evergreen_tree: and {LeavesGet} :fallen_leaf:!");
                     await MongoHandler.UpdateInventory(user.Id, "AxeUses", (inv.AxeUses - 1));
                 }
                 else if (inv.AxeUses >= 7 && inv.AxeUses <= 9)
                 {
                     if (LeavesGet >= 18) LeavesGet -= 1;
-                    await RespondAsync($"<@{user.Id}> successfully chopped down a tree!\nThey got {LogsGet} :evergreen_tree: and {LeavesGet} :fallen_leaf:!");
+                    await RespondAsync($"{Context.User.Mention} successfully chopped down a tree!\nThey got {LogsGet} :evergreen_tree: and {LeavesGet} :fallen_leaf:!");
                     await MongoHandler.UpdateInventory(user.Id, "AxeUses", (inv.AxeUses - 1));
                 }
                 else if (inv.AxeUses >= 4 && inv.AxeUses <= 6)
                 {
                     if (LeavesGet >= 14) LeavesGet -= 2;
                     if (LogsGet == 4) LogsGet -= 1;
-                    await RespondAsync($"<@{user.Id}> managed to chop down a tree!\nThey got {LogsGet} :evergreen_tree: and {LeavesGet} :fallen_leaf:!");
+                    await RespondAsync($"{Context.User.Mention} managed to chop down a tree!\nThey got {LogsGet} :evergreen_tree: and {LeavesGet} :fallen_leaf:!");
                     await MongoHandler.UpdateInventory(user.Id, "AxeUses", (inv.AxeUses - 1));
                 }
                 else if (inv.AxeUses >= 2 && inv.AxeUses <= 3)
                 {
                     if (LeavesGet >= 10) LeavesGet -= 3;
                     if (LogsGet >= 3) LogsGet -= 1;
-                    await RespondAsync($"<@{user.Id}> struggled with a weak axe, but managed to chop some wimpy tree.\nThey got {LogsGet} :evergreen_tree: and {LeavesGet} :fallen_leaf:!");
+                    await RespondAsync($"{Context.User.Mention} struggled with a weak axe, but managed to chop some wimpy tree.\nThey got {LogsGet} :evergreen_tree: and {LeavesGet} :fallen_leaf:!");
                     await MongoHandler.UpdateInventory(user.Id, "AxeUses", (inv.AxeUses - 1));
                 }
                 else if (inv.AxeUses == 1 && inv.Axes >= 2)
                 {
                     if (LeavesGet >= 6) LeavesGet -= 4;
                     if (LogsGet >= 3) LogsGet -= 1;
-                    await RespondAsync($"<@{user.Id}> broke one of their super weak axes cutting down their last tree!\nThey got {LogsGet} :evergreen_tree: and {LeavesGet} :fallen_leaf:!");
+                    await RespondAsync($"{Context.User.Mention} broke one of their super weak axes cutting down their last tree!\nThey got {LogsGet} :evergreen_tree: and {LeavesGet} :fallen_leaf:!");
                     await MongoHandler.UpdateInventory(user.Id, "AxeUses", 10);
                     await MongoHandler.UpdateInventory(user.Id, "Axes", (inv.Axes - 1));
                 }
@@ -179,7 +180,7 @@ namespace PrototonBot.Interactions
                 {
                     if (LeavesGet >= 6) LeavesGet -= 4;
                     if (LogsGet >= 2) LogsGet -= 1;
-                    await RespondAsync($"<@{user.Id}> broke their only super weak axe cutting down their last tree!\nThey got {LogsGet} :evergreen_tree: and {LeavesGet} :fallen_leaf:!");
+                    await RespondAsync($"{Context.User.Mention} broke their only super weak axe cutting down their last tree!\nThey got {LogsGet} :evergreen_tree: and {LeavesGet} :fallen_leaf:!");
                     await MongoHandler.UpdateInventory(user.Id, "AxeUses", (inv.AxeUses - 1));
                     await MongoHandler.UpdateInventory(user.Id, "Axes", (inv.Axes - 1));
                 }

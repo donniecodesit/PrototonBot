@@ -12,5 +12,7 @@
     "discord": "DiscordTokenHere"
   },
   "CacheDir": "/tmp/prototon",
-  "ActiveRedeemCodes": ["notavalidcode"]
+  "ActiveRedeemCodes": ["notavalidcode"],
+  "DefaultMessageWelcomes": ":sparkling_heart: Welcome <user.mention>, to <server.name>! Have a wonderful time here! :sparkling_heart:",
+  "DefaultMessageLeaves": "<user.name> has departed from this server.. farewell, traveler! :wave:"
 }

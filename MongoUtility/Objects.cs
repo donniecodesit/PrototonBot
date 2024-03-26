@@ -5,7 +5,7 @@ namespace PrototonBot.MongoUtility
     public class UserObject
     {
         public string Id { get; set; }
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public long Money { get; set; }
         public long LastDaily { get; set; }
         public long DailyStreak { get; set; }
@@ -48,6 +48,8 @@ namespace PrototonBot.MongoUtility
         public bool LeaveMessages { get; set; }
         public bool LogDeletedMessages { get; set; }
         public bool LogUpdatedMessages { get; set; }
+        public string WelcomeMessageString { get; set; }
+        public string LeaveMessageString { get; set; }
     }
 
     public class InventoryObject

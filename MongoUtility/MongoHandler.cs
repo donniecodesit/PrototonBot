@@ -179,6 +179,8 @@ namespace PrototonBot.MongoUtility
             data.LeaveMessages = false;
             data.LogDeletedMessages = false;
             data.LogUpdatedMessages = false;
+            data.WelcomeMessageString = Program.DefaultMessageWelcomes;
+            data.LeaveMessageString = Program.DefaultMessageLeaves;
             serverCollection.InsertOne(data);
             return Task.CompletedTask;
         }

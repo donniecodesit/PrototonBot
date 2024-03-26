@@ -5,6 +5,7 @@ using PrototonBot.MongoUtility;
 using ImageMagick;
 using MongoDB.Driver;
 using System.Net;
+using System.Threading.Channels;
 
 namespace PrototonBot.Interactions
 {
@@ -20,7 +21,7 @@ namespace PrototonBot.Interactions
             {
                 await RespondAsync("Nicknames must be 1 - 32 characters.");
                 return;
-            } 
+            }
 
             if (profaneWord != "")
             {
@@ -33,7 +34,8 @@ namespace PrototonBot.Interactions
                 {
                     await Context.Guild.GetUser(Context.Interaction.User.Id).ModifyAsync(user => user.Nickname = nickname);
                     await RespondAsync($"Cool beans! Your nickname is now {nickname}!");
-                } catch (Exception err)
+                }
+                catch (Exception err)
                 {
                     Console.WriteLine(err);
                     if (err.Message.Contains("Permissions"))
@@ -153,31 +155,50 @@ namespace PrototonBot.Interactions
         }
 
         [SlashCommand("setdescription", "[profile] Set your profile description. Max chars 240.")]
-        public async Task SetDescription([Summary(description: "Your new description. Type 'clear' to remove.")] String message)
+        public async Task SetDescription([Summary(description: "Your new description. Type 'reset' to reset.")] String message)
         {
             UserObject mongoUsr = MongoHandler.GetUser(Context.User.Id.ToString()).Result;
-            if (message.ToLower() == "clear")
+            var messageTrimmed = message.Length <= 400 ? message : (message.Substring(0, 400) + "...");
+
+            if (message.ToLower() == "reset")
             {
                 await MongoHandler.UpdateUser(mongoUsr.Id, "Description", "This user has not set a description.");
-                await RespondAsync("Your description has been cleared!");
+                var _embed = new EmbedBuilder();
+                _embed.WithColor(0x00FF00);
+                _embed.WithAuthor("Description has been reset!", Context.User.GetAvatarUrl());
+                _embed.WithDescription("This user has not set a description.");
+                await RespondAsync("", embed: _embed.Build());
                 return;
             }
             else
             {
-                if (message.Count() > 240)
+                var profaneWord = Utilities.profanityFilter(message);
+                if (profaneWord != "")
                 {
-                    await RespondAsync($"Please keep your description within 240 characters.\nYour character count was: {message.Count()}/240");
+                    var _embed = new EmbedBuilder();
+                    _embed.WithColor(0xFF0000);
+                    _embed.WithAuthor("Please don't use profanity in your description!", Context.User.GetAvatarUrl());
+                    _embed.WithDescription($"Identified: `{profaneWord}`\n\n{messageTrimmed}");
+                    await RespondAsync($"", embed: _embed.Build());
+                    return;
+                }
+                else if (message.Count() > 240)
+                {
+                    var _embed = new EmbedBuilder();
+                    _embed.WithColor(0xFF0000);
+                    _embed.WithAuthor("Please keep your description within 240 characters!", Context.User.GetAvatarUrl());
+                    _embed.WithDescription($"{message.Count()}/240\n\n{messageTrimmed}");
+                    await RespondAsync($"", embed: _embed.Build());
+                    return;
                 }
                 else
                 {
-                    var profaneWord = Utilities.profanityFilter(message);
-                    if (profaneWord != "")
-                    {
-                        await RespondAsync($"I spot some foul language: `{profaneWord}`", ephemeral: true);
-                        return;
-                    }
-                    await MongoHandler.UpdateUser(mongoUsr.Id, "Description", message);
-                    await RespondAsync($"Alright, done! Your description has been updated!\n> {message}");
+                    await MongoHandler.UpdateUser(mongoUsr.Id, "Description", $"{message}");
+                    var _embed = new EmbedBuilder();
+                    _embed.WithColor(0x00FF00);
+                    _embed.WithAuthor("Description successfully updated!", Context.User.GetAvatarUrl());
+                    _embed.WithDescription(message);
+                    await RespondAsync("", embed: _embed.Build());
                 }
                 return;
             }
@@ -248,7 +269,7 @@ namespace PrototonBot.Interactions
 
                 var dailyRejected = new EmbedBuilder();
                 dailyRejected.WithColor(0xFFAB59);
-                dailyRejected.AddField("Daily Already Claimed!", $"<@{mongoUsr.Id}>, You've already claimed your daily today!\nGet your next one in {str}");
+                dailyRejected.AddField("Daily Already Claimed!", $"{Context.User.Mention}, You've already claimed your daily today!\nGet your next one in {str}");
                 dailyRejected.WithThumbnailUrl(Context.User.GetAvatarUrl());
 
                 await RespondAsync("", embed: dailyRejected.Build());
@@ -340,7 +361,7 @@ namespace PrototonBot.Interactions
 
             var PatSuccess = new EmbedBuilder();
             PatSuccess.WithColor(0xFFAB59);
-            PatSuccess.AddField("Pat Success!", $"<@{taggedUsr.Id}> has received a pat! <3\n{authorUsr.Name} also received 1 Pat Coin!");
+            PatSuccess.AddField("Pat Success!", $"<@{taggedUsr.Id}> has received a pat! <3\n{Context.User.Mention} received 1 Pat Coin!");
             await RespondAsync("", embed: PatSuccess.Build());
         }
 

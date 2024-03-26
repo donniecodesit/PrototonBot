@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using PrototonBot.MongoUtility;
+using System.Threading.Channels;
 
 namespace PrototonBot.Interactions
 {
@@ -279,7 +280,7 @@ namespace PrototonBot.Interactions
             _embed.AddField("Server Information", $"" +
                 $"Server ID: `{guild.Id}`\n" +
                 $"Created At: `{guild.CreatedAt}`\n" +
-                $"Owner: <@{guild.Owner.Id}>\n" +
+                $"Owner: {guild.Owner.Mention}\n" +
                 $"Members: `{guild.MemberCount}`\n" +
                 $"Roles: `{guild.Roles.Count}`\n" +
                 $"Verification Level: `{guild.VerificationLevel}`\n" +
@@ -289,7 +290,7 @@ namespace PrototonBot.Interactions
                 $"Welcome Messages: `{mongoSvr.WelcomeMessages}`\n" +
                 $"Leave Messages: `{mongoSvr.LeaveMessages}`\n" +
                 $"Log Deleted Messages: `{mongoSvr.LogDeletedMessages}`\n" +
-                $"Log Edited Messages: `{mongoSvr.LogUpdatedMessages}`\n" 
+                $"Log Edited Messages: `{mongoSvr.LogUpdatedMessages}`\n"
                 );
 
             await RespondAsync("", embed: _embed.Build());
@@ -321,6 +322,126 @@ namespace PrototonBot.Interactions
 
             await Task.Delay(2500);
             await DeleteOriginalResponseAsync();
+        }
+
+        [SlashCommand("setwelcomemessage", "[admin] Change your server's welcome message to a custom message!")]
+        public async Task SetMessageForWelcomes([Summary(description: "Type 'reset' to reset. Supports <user.name>, <user.mention>, <server.name>, and <server.members>.")] String message)
+        {
+            var messageTrimmed = message.Length <= 400 ? message : (message.Substring(0, 400) + "...");
+
+            if (message.ToLower() == "reset")
+            {
+                await MongoHandler.UpdateServer(Context.Guild.Id.ToString(), "WelcomeMessageString", $"{Program.DefaultMessageWelcomes}");
+                var _embed = new EmbedBuilder();
+                _embed.WithColor(0x00FF00);
+                _embed.WithTitle("Welcome message reset!");
+                _embed.WithDescription($"{Program.DefaultMessageWelcomes}");
+                await RespondAsync("", embed: _embed.Build());
+                return;
+            }
+            else
+            {
+                var profaneWord = Utilities.profanityFilter(message);
+                if (profaneWord != "")
+                {
+                    var _embed = new EmbedBuilder();
+                    _embed.WithColor(0xFF0000);
+                    _embed.WithDescription(message);
+                    _embed.WithTitle("Please don't use profanity in this message!");
+                    _embed.WithDescription($"Identified: `{profaneWord}`\n\n{messageTrimmed}");
+                    await RespondAsync($"", embed: _embed.Build());
+                    return;
+                }
+                else if (message.Count() > 240)
+                {
+                    var _embed = new EmbedBuilder();
+                    _embed.WithColor(0xFF0000);
+                    _embed.WithDescription(message);
+                    _embed.WithTitle("Please keep your message within 240 characters!");
+                    _embed.WithDescription($"{message.Count()}/240\n\n{messageTrimmed}");
+                    await RespondAsync($"", embed: _embed.Build());
+                    return;
+                }
+                else if (!message.Contains("<user.name>") && !message.Contains("<user.mention>"))
+                {
+                    var _embed = new EmbedBuilder();
+                    _embed.WithColor(0xFF0000);
+                    _embed.WithTitle("Please include the user in this message!");
+                    _embed.WithDescription($"Use `<user.name>` or `<user.mention>`\n\n{messageTrimmed}");
+                    await RespondAsync($"", embed: _embed.Build());
+                    return;
+                }
+                else
+                {
+                    await MongoHandler.UpdateServer(Context.Guild.Id.ToString(), "WelcomeMessageString", $"{message}");
+                    var _embed = new EmbedBuilder();
+                    _embed.WithColor(0x00FF00);
+                    _embed.WithTitle("Welcome message successfully updated!");
+                    _embed.WithDescription(message);
+                    await RespondAsync("", embed: _embed.Build());
+                }
+                return;
+            }
+        }
+
+        [SlashCommand("setleavemessage", "[admin] Change your server's leave message to a custom message!")]
+        public async Task SetMessageForLeaves([Summary(description: "Type 'reset' to reset. Supports <user.name>, <user.mention>, <server.name>, and <server.members>.")] String message)
+        {
+            var messageTrimmed = message.Length <= 400 ? message : (message.Substring(0, 400) + "...");
+
+            if (message.ToLower() == "reset")
+            {
+                await MongoHandler.UpdateServer(Context.Guild.Id.ToString(), "LeaveMessageString", $"{Program.DefaultMessageLeaves}");
+                var _embed = new EmbedBuilder();
+                _embed.WithColor(0x00FF00);
+                _embed.WithTitle("Leave message reset!");
+                _embed.WithDescription($"{Program.DefaultMessageLeaves}");
+                await RespondAsync("", embed: _embed.Build());
+                return;
+            }
+            else
+            {
+                var profaneWord = Utilities.profanityFilter(message);
+                if (profaneWord != "")
+                {
+                    var _embed = new EmbedBuilder();
+                    _embed.WithColor(0xFF0000);
+                    _embed.WithDescription(message);
+                    _embed.WithTitle("Please don't use profanity in this message!");
+                    _embed.WithDescription($"Identified: `{profaneWord}`\n\n{messageTrimmed}");
+                    await RespondAsync($"", embed: _embed.Build());
+                    return;
+                }
+                else if (message.Count() > 240)
+                {
+                    var _embed = new EmbedBuilder();
+                    _embed.WithColor(0xFF0000);
+                    _embed.WithDescription(message);
+                    _embed.WithTitle("Please keep your message within 240 characters!");
+                    _embed.WithDescription($"{message.Count()}/240\n\n{messageTrimmed}");
+                    await RespondAsync($"", embed: _embed.Build());
+                    return;
+                }
+                else if (!message.Contains("<user.name>") && !message.Contains("<user.mention>"))
+                {
+                    var _embed = new EmbedBuilder();
+                    _embed.WithColor(0xFF0000);
+                    _embed.WithTitle("Please include the user in this message!");
+                    _embed.WithDescription($"Use `<user.name>` or `<user.mention>`\n\n{messageTrimmed}");
+                    await RespondAsync($"", embed: _embed.Build());
+                    return;
+                }
+                else
+                {
+                    await MongoHandler.UpdateServer(Context.Guild.Id.ToString(), "LeaveMessageString", $"{message}");
+                    var _embed = new EmbedBuilder();
+                    _embed.WithColor(0x00FF00);
+                    _embed.WithDescription(message);
+                    _embed.WithTitle("Leave message successfully updated!");
+                    await RespondAsync("", embed: _embed.Build());
+                }
+                return;
+            }
         }
     }
 }
