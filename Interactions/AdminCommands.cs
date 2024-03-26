@@ -327,7 +327,11 @@ namespace PrototonBot.Interactions
         [SlashCommand("setwelcomemessage", "[admin] Change your server's welcome message to a custom message!")]
         public async Task SetMessageForWelcomes([Summary(description: "Type 'reset' to reset. Supports <user.name>, <user.mention>, <server.name>, and <server.members>.")] String message)
         {
+            var mongoSvr = MongoHandler.GetServer(Context.Guild.Id.ToString()).Result;
             var messageTrimmed = message.Length <= 400 ? message : (message.Substring(0, 400) + "...");
+
+            var setChannel = mongoSvr.WelcomeChannel != "" ? $"#{Context.Guild.GetChannel(ulong.Parse(mongoSvr.WelcomeChannel)).Name}! ✔" : "no channel! 🞬";
+            var footerMessage = $"Welcome messages are {(mongoSvr.WelcomeMessages ? "enabled! ✔" : "disabled! 🞬")}\nWelcome channel set to: {setChannel}";
 
             if (message.ToLower() == "reset")
             {
@@ -336,6 +340,7 @@ namespace PrototonBot.Interactions
                 _embed.WithColor(0x00FF00);
                 _embed.WithTitle("Welcome message reset!");
                 _embed.WithDescription($"{Program.DefaultMessageWelcomes}");
+                _embed.WithFooter(footerMessage);
                 await RespondAsync("", embed: _embed.Build());
                 return;
             }
@@ -349,6 +354,7 @@ namespace PrototonBot.Interactions
                     _embed.WithDescription(message);
                     _embed.WithTitle("Please don't use profanity in this message!");
                     _embed.WithDescription($"Identified: `{profaneWord}`\n\n{messageTrimmed}");
+                    _embed.WithFooter(footerMessage);
                     await RespondAsync($"", embed: _embed.Build());
                     return;
                 }
@@ -359,6 +365,7 @@ namespace PrototonBot.Interactions
                     _embed.WithDescription(message);
                     _embed.WithTitle("Please keep your message within 240 characters!");
                     _embed.WithDescription($"{message.Count()}/240\n\n{messageTrimmed}");
+                    _embed.WithFooter(footerMessage);
                     await RespondAsync($"", embed: _embed.Build());
                     return;
                 }
@@ -368,6 +375,7 @@ namespace PrototonBot.Interactions
                     _embed.WithColor(0xFF0000);
                     _embed.WithTitle("Please include the user in this message!");
                     _embed.WithDescription($"Use `<user.name>` or `<user.mention>`\n\n{messageTrimmed}");
+                    _embed.WithFooter(footerMessage);
                     await RespondAsync($"", embed: _embed.Build());
                     return;
                 }
@@ -378,6 +386,7 @@ namespace PrototonBot.Interactions
                     _embed.WithColor(0x00FF00);
                     _embed.WithTitle("Welcome message successfully updated!");
                     _embed.WithDescription(message);
+                    _embed.WithFooter(footerMessage);
                     await RespondAsync("", embed: _embed.Build());
                 }
                 return;
@@ -387,7 +396,11 @@ namespace PrototonBot.Interactions
         [SlashCommand("setleavemessage", "[admin] Change your server's leave message to a custom message!")]
         public async Task SetMessageForLeaves([Summary(description: "Type 'reset' to reset. Supports <user.name>, <user.mention>, <server.name>, and <server.members>.")] String message)
         {
+            var mongoSvr = MongoHandler.GetServer(Context.Guild.Id.ToString()).Result;
             var messageTrimmed = message.Length <= 400 ? message : (message.Substring(0, 400) + "...");
+
+            var setChannel = mongoSvr.LeaveChannel != "" ? $"#{Context.Guild.GetChannel(ulong.Parse(mongoSvr.LeaveChannel)).Name}! ✔" : "no channel! 🞬";
+            var footerMessage = $"Leave messages are {(mongoSvr.LeaveMessages ? "enabled! ✔" : "disabled! 🞬")}\nLeave channel set to: {setChannel}";
 
             if (message.ToLower() == "reset")
             {
@@ -396,6 +409,7 @@ namespace PrototonBot.Interactions
                 _embed.WithColor(0x00FF00);
                 _embed.WithTitle("Leave message reset!");
                 _embed.WithDescription($"{Program.DefaultMessageLeaves}");
+                _embed.WithFooter(footerMessage);
                 await RespondAsync("", embed: _embed.Build());
                 return;
             }
@@ -409,6 +423,7 @@ namespace PrototonBot.Interactions
                     _embed.WithDescription(message);
                     _embed.WithTitle("Please don't use profanity in this message!");
                     _embed.WithDescription($"Identified: `{profaneWord}`\n\n{messageTrimmed}");
+                    _embed.WithFooter(footerMessage);
                     await RespondAsync($"", embed: _embed.Build());
                     return;
                 }
@@ -419,6 +434,7 @@ namespace PrototonBot.Interactions
                     _embed.WithDescription(message);
                     _embed.WithTitle("Please keep your message within 240 characters!");
                     _embed.WithDescription($"{message.Count()}/240\n\n{messageTrimmed}");
+                    _embed.WithFooter(footerMessage);
                     await RespondAsync($"", embed: _embed.Build());
                     return;
                 }
@@ -428,6 +444,7 @@ namespace PrototonBot.Interactions
                     _embed.WithColor(0xFF0000);
                     _embed.WithTitle("Please include the user in this message!");
                     _embed.WithDescription($"Use `<user.name>` or `<user.mention>`\n\n{messageTrimmed}");
+                    _embed.WithFooter(footerMessage);
                     await RespondAsync($"", embed: _embed.Build());
                     return;
                 }
@@ -438,6 +455,7 @@ namespace PrototonBot.Interactions
                     _embed.WithColor(0x00FF00);
                     _embed.WithDescription(message);
                     _embed.WithTitle("Leave message successfully updated!");
+                    _embed.WithFooter(footerMessage);
                     await RespondAsync("", embed: _embed.Build());
                 }
                 return;
